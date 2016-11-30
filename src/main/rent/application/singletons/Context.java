@@ -1,5 +1,6 @@
 package rent.application.singletons;
 
+import rent.application.managers.GazManager;
 import rent.application.managers.ThreadManager;
 import rent.constants.Services;
 import rent.interfaces.IEntity;
@@ -30,6 +31,7 @@ public class Context {
     private Map<String, Object> mSystemServicesRepository = new HashMap<String, Object>() {
         {
             put(Services.THREAD_MANAGER, new ThreadManager());
+            put(Services.GAZ_MANAGER, new GazManager());
         }
     };
 

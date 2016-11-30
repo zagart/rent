@@ -7,4 +7,5 @@ package rent.constants;
  */
 public interface Services {
     String THREAD_MANAGER = "Thread manager";
+    String GAZ_MANAGER = "Gaz manager";
 }

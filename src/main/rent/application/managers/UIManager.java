@@ -17,8 +17,10 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import rent.application.DatabaseLoader;
+import rent.application.singletons.Context;
 import rent.application.utils.ReflectionUtil;
 import rent.application.utils.UiUtil;
+import rent.constants.Services;
 import rent.constants.UiConstants;
 import rent.interfaces.IEntity;
 import rent.model.entities.*;
@@ -46,6 +48,7 @@ public class UIManager {
     private int counter = 0;
     private Node mArrow;
     private WidgetDrawer mDrawer = new WidgetDrawer();
+    private GazManager mGazManager = (GazManager) Context.getSystemService(Services.GAZ_MANAGER);
     private CustomTextField mNumericField;
     private FlowPane mRoot = new FlowPane();
     private CustomTextField mSearch = new CustomTextField();
@@ -55,9 +58,9 @@ public class UIManager {
         @Override
         public void handle(final long pNow) {
             if (counter++ > COUNTER_MAX && mTableManager.getItems().size() > 0) {
-                final int meterValue = mRandom.nextInt(DatabaseLoader.EXPENSE_BOUND);
-                redrawArrow(meterValue);
+                final int meterValue = mGazManager.getGazForSelectedCustomer(mTableManager);
                 showMeterValue(meterValue);
+                redrawArrow(meterValue);
                 counter = 0;
             }
         }
@@ -161,6 +164,7 @@ public class UIManager {
 
     @SuppressWarnings("unchecked")
     <E extends IEntity> void reloadTableData(final Class<E> pClass) {
+        mGazManager.stop();
         mArrowTimer.stop();
         final ObservableList<Node> children = mRoot.getChildren();
         children.remove(mTableManager);
