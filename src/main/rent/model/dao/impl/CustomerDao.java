@@ -1,6 +1,6 @@
-package rent.model.dataaccess.impl;
+package rent.model.dao.impl;
 
-import rent.model.dataaccess.AbstractDao;
+import rent.model.dao.AbstractDao;
 import rent.model.entities.Customer;
 
 /**

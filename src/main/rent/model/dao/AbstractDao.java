@@ -1,4 +1,4 @@
-package rent.model.dataaccess;
+package rent.model.dao;
 
 import org.hibernate.query.Query;
 import rent.interfaces.IDao;
@@ -14,23 +14,19 @@ import java.util.Set;
 import static rent.utils.HibernateUtil.getCurrentSession;
 
 /**
- * Abstract Hibernate DAO class.
+ * Abstract Hibernate DAO class implementation.
  *
  * @param <T>
  * @param <PK>
  */
 @SuppressWarnings("unchecked")
 public abstract class AbstractDao<T extends IEntity, PK extends Serializable> implements IDao<T, PK> {
-    private final T entityObj;
-
-    {
-        entityObj = (T) ReflectionUtil.getGenericObject(this, 0);
-    }
+    private final T mEntity = (T) ReflectionUtil.getGenericObject(this, 0);
 
     @Override
     public void delete(final PK pId) {
-        T obj = (T) getCurrentSession().load(entityObj.getClass(), pId);
-        getCurrentSession().delete(obj);
+        T entity = (T) getCurrentSession().load(mEntity.getClass(), pId);
+        getCurrentSession().delete(entity);
     }
 
     @Override
@@ -47,14 +43,14 @@ public abstract class AbstractDao<T extends IEntity, PK extends Serializable> im
 
     @Override
     public List<T> getAll() {
-        String hql = String.format("select target from %s target", entityObj.getClass().getName());
+        String hql = String.format("select target from %s target", mEntity.getClass().getName());
         Query query = getCurrentSession().createQuery(hql);
         return query.list();
     }
 
     @Override
     public T getById(final PK pId) {
-        String hql = String.format("select target from %s target where id = :targetId", entityObj.getClass().getName());
+        String hql = String.format("select target from %s target where id = :targetId", mEntity.getClass().getName());
         Query query = getCurrentSession().createQuery(hql);
         query.setParameter("targetId", pId);
         return (T) query.uniqueResult();
