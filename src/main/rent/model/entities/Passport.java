@@ -1,4 +1,4 @@
-package rent.model;
+package rent.model.entities;
 
 import rent.interfaces.IEntity;
 
@@ -15,7 +15,7 @@ import java.util.Date;
 public class Passport implements IEntity {
     private Date mDateOfIssue;
     private Date mExpirationDate;
-    private String mId;
+    private Long mId;
     private String mIssuedBy;
 
     @Column(name = "date_of_issue", nullable = false)
@@ -41,11 +41,11 @@ public class Passport implements IEntity {
     @Id
     @OneToOne(targetEntity = Customer.class)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public String getId() {
+    public Long getId() {
         return mId;
     }
 
-    public void setId(String pId) {
+    public void setId(Long pId) {
         mId = pId;
     }
 

@@ -3,9 +3,10 @@ package rent.interfaces;
 import java.io.Serializable;
 
 /**
- * Interface contains functionality of Entity classes.
+ * Interface for Entity classes.
  *
  * @author zagart
  */
 public interface IEntity extends Serializable {
+    Long getId();
 }

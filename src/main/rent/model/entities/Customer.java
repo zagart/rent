@@ -1,4 +1,4 @@
-package rent.model;
+package rent.model.entities;
 
 import rent.interfaces.IEntity;
 
