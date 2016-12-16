@@ -3,6 +3,7 @@ package rent.model.entities;
 import rent.interfaces.IEntity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,41 +15,64 @@ import java.util.List;
 @Table(name = "customer", catalog = "rent")
 public class Customer implements IEntity {
     private String mAddress;
-    private List<Bill> mBillList;
-    private List<Expense> mExpenseList;
+    private List<Bill> mBillList = new ArrayList<>();
+    private List<Expense> mExpenseList = new ArrayList<>();
     private String mFirstName;
     private Long mId;
     private String mLastName;
-    private String mPassportId;
+    private Passport mPassport;
     private String mPatronymic;
-    private List<Payment> mPaymentList;
+    private List<Payment> mPaymentList = new ArrayList<>();
     private String mPhoneNumber;
+
+    public void addBill(final Bill pBill) {
+        mBillList.add(pBill);
+        pBill.setCustomer(this);
+    }
+
+    public void addExpense(final Expense pExpense) {
+        mExpenseList.add(pExpense);
+        pExpense.setCustomer(this);
+    }
+
+    public void addPassport(final Passport pPassport) {
+        mPassport = pPassport;
+        pPassport.setCustomer(this);
+    }
+
+    public void addPayment(final Payment pPayment) {
+        mPaymentList.add(pPayment);
+        pPayment.setCustomer(this);
+    }
 
     @Column(name = "address")
     public String getAddress() {
         return mAddress;
     }
 
-    public void setAddress(String pAddress) {
+    public Customer setAddress(String pAddress) {
         mAddress = pAddress;
+        return this;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, targetEntity = Bill.class, mappedBy = "customerId")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "customer")
     public List<Bill> getBillList() {
         return mBillList;
     }
 
-    public void setBillList(List<Bill> pBillList) {
+    public Customer setBillList(List<Bill> pBillList) {
         mBillList = pBillList;
+        return this;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, targetEntity = Expense.class, mappedBy = "customerId")
+    @OneToMany(fetch = FetchType.LAZY, targetEntity = Expense.class, mappedBy = "customer")
     public List<Expense> getExpenseList() {
         return mExpenseList;
     }
 
-    public void setExpenseList(List<Expense> pExpenseList) {
+    public Customer setExpenseList(List<Expense> pExpenseList) {
         mExpenseList = pExpenseList;
+        return this;
     }
 
     @Column(name = "first_name")
@@ -56,8 +80,9 @@ public class Customer implements IEntity {
         return mFirstName;
     }
 
-    public void setFirstName(String pFirstName) {
+    public Customer setFirstName(String pFirstName) {
         mFirstName = pFirstName;
+        return this;
     }
 
     @Id
@@ -67,8 +92,9 @@ public class Customer implements IEntity {
         return mId;
     }
 
-    public void setId(Long pId) {
+    public Customer setId(Long pId) {
         mId = pId;
+        return this;
     }
 
     @Column(name = "last_name", nullable = false)
@@ -76,17 +102,18 @@ public class Customer implements IEntity {
         return mLastName;
     }
 
-    public void setLastName(String pLastName) {
+    public Customer setLastName(String pLastName) {
         mLastName = pLastName;
+        return this;
     }
 
-    @OneToOne(targetEntity = Passport.class, mappedBy = "id")
-    public String getPassportId() {
-        return mPassportId;
+    @OneToOne(targetEntity = Passport.class, mappedBy = "customer")
+    public Passport getPassport() {
+        return mPassport;
     }
 
-    public void setPassportId(String pPassportId) {
-        mPassportId = pPassportId;
+    public void setPassport(Passport pPassport) {
+        mPassport = pPassport;
     }
 
     @Column(name = "patronymic")
@@ -94,17 +121,19 @@ public class Customer implements IEntity {
         return mPatronymic;
     }
 
-    public void setPatronymic(String pPatronymic) {
+    public Customer setPatronymic(String pPatronymic) {
         mPatronymic = pPatronymic;
+        return this;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, targetEntity = Payment.class, mappedBy = "customerId")
+    @OneToMany(fetch = FetchType.LAZY, targetEntity = Payment.class, mappedBy = "customer")
     public List<Payment> getPaymentList() {
         return mPaymentList;
     }
 
-    public void setPaymentList(List<Payment> pPaymentList) {
+    public Customer setPaymentList(List<Payment> pPaymentList) {
         mPaymentList = pPaymentList;
+        return this;
     }
 
     @Column(name = "phone")
@@ -112,7 +141,8 @@ public class Customer implements IEntity {
         return mPhoneNumber;
     }
 
-    public void setPhoneNumber(String pPhoneNumber) {
+    public Customer setPhoneNumber(String pPhoneNumber) {
         mPhoneNumber = pPhoneNumber;
+        return this;
     }
 }

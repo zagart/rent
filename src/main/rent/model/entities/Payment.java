@@ -15,7 +15,7 @@ import java.util.Date;
 public class Payment implements IEntity {
     private Long mAmount;
     private Long mBacklog;
-    private Long mCustomerId;
+    private Customer mCustomer;
     private Long mId;
     private Date mTimestamp;
 
@@ -24,8 +24,9 @@ public class Payment implements IEntity {
         return mAmount;
     }
 
-    public void setAmount(Long pAmount) {
+    public Payment setAmount(Long pAmount) {
         mAmount = pAmount;
+        return this;
     }
 
     @Column(name = "backlog", nullable = false)
@@ -33,27 +34,31 @@ public class Payment implements IEntity {
         return mBacklog;
     }
 
-    public void setBacklog(Long pBacklog) {
+    public Payment setBacklog(Long pBacklog) {
         mBacklog = pBacklog;
+        return this;
     }
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Customer.class)
-    public Long getCustomerId() {
-        return mCustomerId;
+    public Customer getCustomer() {
+        return mCustomer;
     }
 
-    public void setCustomerId(Long pCustomerId) {
-        mCustomerId = pCustomerId;
+    public Payment setCustomer(Customer pCustomer) {
+        mCustomer = pCustomer;
+        return this;
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     public Long getId() {
         return mId;
     }
 
-    public void setId(Long pId) {
+    public Payment setId(Long pId) {
         mId = pId;
+        return this;
     }
 
     @Column(name = "timestamp", nullable = false)
@@ -62,7 +67,8 @@ public class Payment implements IEntity {
         return mTimestamp;
     }
 
-    public void setTimestamp(Date pTimestamp) {
+    public Payment setTimestamp(Date pTimestamp) {
         mTimestamp = pTimestamp;
+        return this;
     }
 }

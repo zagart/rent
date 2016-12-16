@@ -1,5 +1,6 @@
 package rent.model.services.impl;
 
+import rent.model.dao.impl.CustomerDao;
 import rent.model.entities.Customer;
 import rent.model.services.AbstractService;
 
@@ -8,5 +9,5 @@ import rent.model.services.AbstractService;
  *
  * @author zagart
  */
-public class CustomerService extends AbstractService<Customer, Long> {
+public class CustomerService extends AbstractService<Customer, Long, CustomerDao> {
 }

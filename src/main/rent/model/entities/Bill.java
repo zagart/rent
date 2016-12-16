@@ -15,12 +15,12 @@ import java.util.Date;
 public class Bill implements IEntity {
     private Date mBillDate;
     private Long mColdWaterBill;
-    private Long mCustomerId;
+    private Customer mCustomer;
     private Long mGazBill;
     private Long mHotWaterBill;
     private Long mId;
     private Long mLightBill;
-    private Long mTariffId;
+    private Tariff mTariff;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "date", nullable = false)
@@ -28,8 +28,9 @@ public class Bill implements IEntity {
         return mBillDate;
     }
 
-    public void setBillDate(Date pBillDate) {
+    public Bill setBillDate(Date pBillDate) {
         mBillDate = pBillDate;
+        return this;
     }
 
     @Column(name = "cold_water", nullable = false)
@@ -37,17 +38,20 @@ public class Bill implements IEntity {
         return mColdWaterBill;
     }
 
-    public void setColdWaterBill(Long pColdWaterBill) {
+    public Bill setColdWaterBill(Long pColdWaterBill) {
         mColdWaterBill = pColdWaterBill;
+        return this;
     }
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Customer.class)
-    public Long getCustomerId() {
-        return mCustomerId;
+    @JoinColumn(name = "customer_id")
+    public Customer getCustomer() {
+        return mCustomer;
     }
 
-    public void setCustomerId(Long pCustomerId) {
-        mCustomerId = pCustomerId;
+    public Bill setCustomer(Customer pCustomer) {
+        mCustomer = pCustomer;
+        return this;
     }
 
     @Column(name = "gaz", nullable = false)
@@ -55,8 +59,9 @@ public class Bill implements IEntity {
         return mGazBill;
     }
 
-    public void setGazBill(Long pGazBill) {
+    public Bill setGazBill(Long pGazBill) {
         mGazBill = pGazBill;
+        return this;
     }
 
     @Column(name = "hot_water", nullable = false)
@@ -64,8 +69,9 @@ public class Bill implements IEntity {
         return mHotWaterBill;
     }
 
-    public void setHotWaterBill(Long pHotWaterBill) {
+    public Bill setHotWaterBill(Long pHotWaterBill) {
         mHotWaterBill = pHotWaterBill;
+        return this;
     }
 
     @Id
@@ -75,8 +81,9 @@ public class Bill implements IEntity {
         return mId;
     }
 
-    public void setId(Long pId) {
+    public Bill setId(Long pId) {
         mId = pId;
+        return this;
     }
 
     @Column(name = "light", nullable = false)
@@ -84,16 +91,19 @@ public class Bill implements IEntity {
         return mLightBill;
     }
 
-    public void setLightBill(Long pLightBill) {
+    public Bill setLightBill(Long pLightBill) {
         mLightBill = pLightBill;
+        return this;
     }
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Tariff.class)
-    public Long getTariffId() {
-        return mTariffId;
+    @JoinColumn(name = "tariff_id")
+    public Tariff getTariff() {
+        return mTariff;
     }
 
-    public void setTariffId(Long pTariffId) {
-        mTariffId = pTariffId;
+    public Bill setTariff(Tariff pTariff) {
+        mTariff = pTariff;
+        return this;
     }
 }

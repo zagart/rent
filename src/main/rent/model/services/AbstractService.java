@@ -20,11 +20,18 @@ import static rent.utils.HibernateUtil.*;
  * @author zagart
  */
 @SuppressWarnings("unchecked")
-public class AbstractService<T extends IEntity, PK extends Serializable> implements IService<T, PK> {
+public class AbstractService<T extends IEntity, PK extends Serializable, DAO extends IDao>
+        implements IService<T, PK, DAO> {
     final private IDao mDao = (IDao) ReflectionUtil.getGenericObject(this, 2);
     final private T mEntity = (T) ReflectionUtil.getGenericObject(this, 0);
     final private Logger mLogger = Logger.getLogger(mDao.getClass());
     private String TAG = mEntity.getClass().getSimpleName();
+
+    @Override
+    public int batchSave(final List<T> pEntities) {
+        pEntities.forEach(this::save);
+        return pEntities.size();
+    }
 
     @SuppressWarnings("MalformedFormatString")
     @Override

@@ -10,7 +10,9 @@ import java.util.Set;
  *
  * @author zagart
  */
-public interface IService<T extends IEntity, PK extends Serializable> {
+public interface IService<T extends IEntity, PK extends Serializable, DAO extends IDao> {
+    int batchSave(final List<T> pEntities);
+
     void delete(final PK pId);
 
     void delete(final T pEntity);

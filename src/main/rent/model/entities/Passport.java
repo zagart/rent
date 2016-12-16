@@ -13,10 +13,21 @@ import java.util.Date;
 @Entity
 @Table(name = "passport", catalog = "rent")
 public class Passport implements IEntity {
+    private Customer mCustomer;
     private Date mDateOfIssue;
     private Date mExpirationDate;
     private Long mId;
     private String mIssuedBy;
+    private String mPersonalNumber;
+
+    @OneToOne(targetEntity = Customer.class)
+    public Customer getCustomer() {
+        return mCustomer;
+    }
+
+    public void setCustomer(Customer pCustomer) {
+        mCustomer = pCustomer;
+    }
 
     @Column(name = "date_of_issue", nullable = false)
     @Temporal(TemporalType.DATE)
@@ -24,8 +35,9 @@ public class Passport implements IEntity {
         return mDateOfIssue;
     }
 
-    public void setDateOfIssue(Date pDateOfIssue) {
+    public Passport setDateOfIssue(Date pDateOfIssue) {
         mDateOfIssue = pDateOfIssue;
+        return this;
     }
 
     @Column(name = "expiration_date", nullable = false)
@@ -34,19 +46,20 @@ public class Passport implements IEntity {
         return mExpirationDate;
     }
 
-    public void setExpirationDate(Date pExpirationDate) {
+    public Passport setExpirationDate(Date pExpirationDate) {
         mExpirationDate = pExpirationDate;
+        return this;
     }
 
     @Id
-    @OneToOne(targetEntity = Customer.class)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long getId() {
         return mId;
     }
 
-    public void setId(Long pId) {
+    public Passport setId(Long pId) {
         mId = pId;
+        return this;
     }
 
     @Column(name = "issued_by", nullable = false)
@@ -54,7 +67,18 @@ public class Passport implements IEntity {
         return mIssuedBy;
     }
 
-    public void setIssuedBy(String pIssuedBy) {
+    public Passport setIssuedBy(String pIssuedBy) {
         mIssuedBy = pIssuedBy;
+        return this;
+    }
+
+    @Column(name = "personal_number", nullable = false)
+    public String getPersonalNumber() {
+        return mPersonalNumber;
+    }
+
+    public Passport setPersonalNumber(String pPersonalNumber) {
+        mPersonalNumber = pPersonalNumber;
+        return this;
     }
 }

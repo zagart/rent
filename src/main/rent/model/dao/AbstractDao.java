@@ -22,6 +22,7 @@ import static rent.utils.HibernateUtil.getCurrentSession;
 @SuppressWarnings("unchecked")
 public abstract class AbstractDao<T extends IEntity, PK extends Serializable> implements IDao<T, PK> {
     private final T mEntity = (T) ReflectionUtil.getGenericObject(this, 0);
+    private String TABLE_NAME = mEntity.getClass().getSimpleName();
 
     @Override
     public void delete(final PK pId) {
@@ -43,14 +44,14 @@ public abstract class AbstractDao<T extends IEntity, PK extends Serializable> im
 
     @Override
     public List<T> getAll() {
-        String hql = String.format("select target from %s target", mEntity.getClass().getName());
+        String hql = String.format("select target from %s target", TABLE_NAME);
         Query query = getCurrentSession().createQuery(hql);
         return query.list();
     }
 
     @Override
     public T getById(final PK pId) {
-        String hql = String.format("select target from %s target where id = :targetId", mEntity.getClass().getName());
+        String hql = String.format("select target from %s target where id = :targetId", TABLE_NAME);
         Query query = getCurrentSession().createQuery(hql);
         query.setParameter("targetId", pId);
         return (T) query.uniqueResult();

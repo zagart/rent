@@ -6,8 +6,8 @@ import javafx.scene.GroupBuilder;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import rent.application.DatabaseLoader;
 import rent.ui.WidgetDrawer;
-import rent.utils.HibernateUtil;
 
 import java.util.Random;
 
@@ -19,8 +19,7 @@ public class App extends Application {
     private Group mRoot;
 
     public static void main(String[] args) {
-        HibernateUtil.openCurrentSession();
-        HibernateUtil.closeCurrentSession();
+        new Thread(DatabaseLoader::activate).start();
         launch(args);
     }
 

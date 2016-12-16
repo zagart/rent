@@ -14,7 +14,7 @@ import java.util.Date;
 @Table(name = "expense", catalog = "rent")
 public class Expense implements IEntity {
     private Long mColdWaterExpense;
-    private Long mCustomerId;
+    private Customer mCustomer;
     private Date mExpenseDate;
     private Long mGazExpense;
     private Long mHotWaterExpense;
@@ -26,17 +26,19 @@ public class Expense implements IEntity {
         return mColdWaterExpense;
     }
 
-    public void setColdWaterExpense(Long pColdWaterExpense) {
+    public Expense setColdWaterExpense(Long pColdWaterExpense) {
         mColdWaterExpense = pColdWaterExpense;
+        return this;
     }
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Customer.class)
-    public Long getCustomerId() {
-        return mCustomerId;
+    public Customer getCustomer() {
+        return mCustomer;
     }
 
-    public void setCustomerId(Long pCustomerId) {
-        mCustomerId = pCustomerId;
+    public Expense setCustomer(Customer pCustomer) {
+        mCustomer = pCustomer;
+        return this;
     }
 
     @Temporal(TemporalType.DATE)
@@ -45,8 +47,9 @@ public class Expense implements IEntity {
         return mExpenseDate;
     }
 
-    public void setExpenseDate(Date pExpenseDate) {
+    public Expense setExpenseDate(Date pExpenseDate) {
         mExpenseDate = pExpenseDate;
+        return this;
     }
 
     @Column(name = "gaz", nullable = false)
@@ -54,8 +57,9 @@ public class Expense implements IEntity {
         return mGazExpense;
     }
 
-    public void setGazExpense(Long pGazExpense) {
+    public Expense setGazExpense(Long pGazExpense) {
         mGazExpense = pGazExpense;
+        return this;
     }
 
     @Column(name = "hot_water", nullable = false)
@@ -63,8 +67,9 @@ public class Expense implements IEntity {
         return mHotWaterExpense;
     }
 
-    public void setHotWaterExpense(Long pHotWaterExpense) {
+    public Expense setHotWaterExpense(Long pHotWaterExpense) {
         mHotWaterExpense = pHotWaterExpense;
+        return this;
     }
 
     @Id
@@ -74,8 +79,9 @@ public class Expense implements IEntity {
         return mId;
     }
 
-    public void setId(Long pId) {
+    public Expense setId(Long pId) {
         mId = pId;
+        return this;
     }
 
     @Column(name = "light", nullable = false)
@@ -83,7 +89,8 @@ public class Expense implements IEntity {
         return mLightExpense;
     }
 
-    public void setLightExpense(Long pLightExpense) {
+    public Expense setLightExpense(Long pLightExpense) {
         mLightExpense = pLightExpense;
+        return this;
     }
 }
