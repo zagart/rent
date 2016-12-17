@@ -16,15 +16,14 @@ import java.util.Random;
  */
 public class DatabaseLoader {
     private static final String AVERAGE = "Обычный";
-    private static final int BILLS_THRESHOLD = 10;
+    private static final int BILLS_THRESHOLD = 30;
     private static final int BILL_BOUND = 10000;
     private static final String CHEAP = "Дешевый";
     private static final int CUSTOMERS_THRESHOLD = 10;
-    private static final int EXPENSES_THRESHOLD = 10;
+    private static final int EXPENSES_THRESHOLD = 30;
     private static final int EXPENSE_BOUND = 1000;
     private static final String EXPENSIVE = "Дорогой";
     private static final int HOUSE_INDEX_BOUND = 50;
-    private static final int PASSPORTS_THRESHOLD = 10;
     private static final int PAYMENTS_THRESHOLD = 30;
     private static final int TIME_BOUND = Integer.MAX_VALUE;
     private static final String[] cities = new String[]{
@@ -89,12 +88,30 @@ public class DatabaseLoader {
                                        final List<Expense> pExpenses,
                                        final List<Bill> pBills,
                                        final List<Passport> pPassports) {
+        final Random random = new Random();
+        int paymentCounter = 0;
+        int billCounter = 0;
+        int expenseCounter = 0;
         for (int i = 0; i < pCustomers.size(); i++) {
             final Customer customer = pCustomers.get(i);
-            customer.addBill(pBills.get(i));
-            customer.addPayment(pPayments.get(i));
-            customer.addExpense(pExpenses.get(i));
             customer.addPassport(pPassports.get(i));
+            paymentCounter = bindPayments(
+                    customer,
+                    pPayments,
+                    random.nextInt(3 + PAYMENTS_THRESHOLD / CUSTOMERS_THRESHOLD),
+                    paymentCounter);
+            billCounter = bindBills(
+                    customer,
+                    pBills,
+                    random.nextInt(3 + BILLS_THRESHOLD / CUSTOMERS_THRESHOLD),
+                    billCounter
+            );
+            expenseCounter = bindExpenses(
+                    customer,
+                    pExpenses,
+                    random.nextInt(3 + EXPENSES_THRESHOLD / CUSTOMERS_THRESHOLD),
+                    expenseCounter
+            );
         }
     }
 
@@ -106,6 +123,39 @@ public class DatabaseLoader {
                                List<Customer> pCustomers) {
         associateBillsAndTariffs(pBills, pTariffs);
         associateCustomerKeys(pCustomers, pPayments, pExpenses, pBills, pPassports);
+    }
+
+    private int bindBills(final Customer pCustomer,
+                          final List<Bill> pBills,
+                          final int pQuantity,
+                          final int pStartIndex) {
+        int i;
+        for (i = pStartIndex; i < pStartIndex + pQuantity; i++) {
+            pCustomer.addBill(pBills.get(i));
+        }
+        return i;
+    }
+
+    private int bindExpenses(final Customer pCustomer,
+                             final List<Expense> pExpenses,
+                             final int pQuantity,
+                             final int pStartIndex) {
+        int i;
+        for (i = pStartIndex; i < pStartIndex + pQuantity; i++) {
+            pCustomer.addExpense(pExpenses.get(i));
+        }
+        return i;
+    }
+
+    private int bindPayments(final Customer pCustomer,
+                             final List<Payment> pPayments,
+                             final int pQuantity,
+                             final int pStartIndex) {
+        int i;
+        for (i = pStartIndex; i < pStartIndex + pQuantity; i++) {
+            pCustomer.addPayment(pPayments.get(i));
+        }
+        return i;
     }
 
     private List<Bill> createBills() {
@@ -173,7 +223,7 @@ public class DatabaseLoader {
         final Random random = new Random();
         return new ArrayList<Passport>() {
             {
-                for (int i = 0; i < PASSPORTS_THRESHOLD; i++) {
+                for (int i = 0; i < CUSTOMERS_THRESHOLD; i++) {
                     add(new Passport()
                             .setId((long) (1000000 + random.nextInt(9000000)))
                             .setDateOfIssue(new Date(System.currentTimeMillis() - random.nextInt(TIME_BOUND)))
