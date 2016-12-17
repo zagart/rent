@@ -1,5 +1,7 @@
 package rent.model.entities;
 
+import javafx.scene.control.TableView;
+import rent.application.utils.JavaFxUtil;
 import rent.interfaces.IEntity;
 
 import javax.persistence.*;
@@ -56,6 +58,16 @@ public class Payment implements IEntity {
         return mId;
     }
 
+    @Override
+    public TableView getTableView() {
+        return JavaFxUtil.createTable(
+                Fields.ID,
+                Fields.CUSTOMER_ID,
+                Fields.AMOUNT,
+                Fields.BACKLOG,
+                Fields.TIMESTAMP);
+    }
+
     public Payment setId(Long pId) {
         mId = pId;
         return this;
@@ -70,5 +82,13 @@ public class Payment implements IEntity {
     public Payment setTimestamp(Date pTimestamp) {
         mTimestamp = pTimestamp;
         return this;
+    }
+
+    private interface Fields {
+        String AMOUNT = "Значение";
+        String BACKLOG = "Задолженность";
+        String CUSTOMER_ID = "ID заказчика";
+        String ID = "ID";
+        String TIMESTAMP = "Дата оплаты";
     }
 }

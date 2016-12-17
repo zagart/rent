@@ -1,5 +1,7 @@
 package rent.model.entities;
 
+import javafx.scene.control.TableView;
+import rent.application.utils.JavaFxUtil;
 import rent.interfaces.IEntity;
 
 import javax.persistence.*;
@@ -92,6 +94,12 @@ public class Customer implements IEntity {
         return mId;
     }
 
+    @Override
+    public TableView getTableView() {
+        return JavaFxUtil.createTable(
+                Fields.ID, Fields.FIRST_NAME, Fields.LAST_NAME, Fields.PATRONYMIC, Fields.ADDRESS, Fields.PHONE_NUMBER);
+    }
+
     public Customer setId(Long pId) {
         mId = pId;
         return this;
@@ -144,5 +152,14 @@ public class Customer implements IEntity {
     public Customer setPhoneNumber(String pPhoneNumber) {
         mPhoneNumber = pPhoneNumber;
         return this;
+    }
+
+    private interface Fields {
+        String ADDRESS = "Адрес";
+        String FIRST_NAME = "Имя";
+        String ID = "ID";
+        String LAST_NAME = "Фамилия";
+        String PATRONYMIC = "Отчество";
+        String PHONE_NUMBER = "Телефон";
     }
 }

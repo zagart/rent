@@ -5,14 +5,14 @@ import rent.constants.LoggerConstants;
 import rent.interfaces.IDao;
 import rent.interfaces.IEntity;
 import rent.interfaces.IService;
-import rent.utils.ReflectionUtil;
+import rent.application.utils.ReflectionUtil;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static rent.utils.HibernateUtil.*;
+import static rent.application.utils.HibernateUtil.*;
 
 /**
  * Abstract Service class implementation.

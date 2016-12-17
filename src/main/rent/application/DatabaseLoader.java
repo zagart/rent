@@ -21,7 +21,7 @@ public class DatabaseLoader {
     private static final String CHEAP = "Дешевый";
     private static final int CUSTOMERS_THRESHOLD = 10;
     private static final int EXPENSES_THRESHOLD = 30;
-    private static final int EXPENSE_BOUND = 1000;
+    public static final int EXPENSE_BOUND = 1000;
     private static final String EXPENSIVE = "Дорогой";
     private static final int HOUSE_INDEX_BOUND = 50;
     private static final int PAYMENTS_THRESHOLD = 30;
@@ -98,18 +98,18 @@ public class DatabaseLoader {
             paymentCounter = bindPayments(
                     customer,
                     pPayments,
-                    random.nextInt(3 + PAYMENTS_THRESHOLD / CUSTOMERS_THRESHOLD),
+                    random.nextInt(2 + PAYMENTS_THRESHOLD / CUSTOMERS_THRESHOLD),
                     paymentCounter);
             billCounter = bindBills(
                     customer,
                     pBills,
-                    random.nextInt(3 + BILLS_THRESHOLD / CUSTOMERS_THRESHOLD),
+                    random.nextInt(2 + BILLS_THRESHOLD / CUSTOMERS_THRESHOLD),
                     billCounter
             );
             expenseCounter = bindExpenses(
                     customer,
                     pExpenses,
-                    random.nextInt(3 + EXPENSES_THRESHOLD / CUSTOMERS_THRESHOLD),
+                    random.nextInt(2 + EXPENSES_THRESHOLD / CUSTOMERS_THRESHOLD),
                     expenseCounter
             );
         }

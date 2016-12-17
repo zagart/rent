@@ -1,5 +1,7 @@
 package rent.model.entities;
 
+import javafx.scene.control.TableView;
+import rent.application.utils.JavaFxUtil;
 import rent.interfaces.IEntity;
 
 import javax.persistence.*;
@@ -57,6 +59,16 @@ public class Passport implements IEntity {
         return mId;
     }
 
+    @Override
+    public TableView getTableView() {
+        return JavaFxUtil.createTable(
+                Fields.ID,
+                Fields.CUSTOMER_ID,
+                Fields.DATE_OF_ISSUE,
+                Fields.EXPIRATION_DATE,
+                Fields.ISSUED_BY);
+    }
+
     public Passport setId(Long pId) {
         mId = pId;
         return this;
@@ -80,5 +92,13 @@ public class Passport implements IEntity {
     public Passport setPersonalNumber(String pPersonalNumber) {
         mPersonalNumber = pPersonalNumber;
         return this;
+    }
+
+    private interface Fields {
+        String CUSTOMER_ID = "ID заказчика";
+        String DATE_OF_ISSUE = "Дата выдачи";
+        String EXPIRATION_DATE = "Дата истечения";
+        String ID = "ID";
+        String ISSUED_BY = "Выдан";
     }
 }

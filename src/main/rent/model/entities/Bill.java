@@ -1,5 +1,7 @@
 package rent.model.entities;
 
+import javafx.scene.control.TableView;
+import rent.application.utils.JavaFxUtil;
 import rent.interfaces.IEntity;
 
 import javax.persistence.*;
@@ -81,6 +83,19 @@ public class Bill implements IEntity {
         return mId;
     }
 
+    @Override
+    public TableView getTableView() {
+        return JavaFxUtil.createTable(
+                Fields.ID,
+                Fields.CUSTOMER_ID,
+                Fields.TARIFF_ID,
+                Fields.LIGHT_BILL,
+                Fields.GAZ_BILL,
+                Fields.COLD_WATER_BILL,
+                Fields.HOT_WATER_BILL,
+                Fields.DATE);
+    }
+
     public Bill setId(Long pId) {
         mId = pId;
         return this;
@@ -105,5 +120,16 @@ public class Bill implements IEntity {
     public Bill setTariff(Tariff pTariff) {
         mTariff = pTariff;
         return this;
+    }
+
+    private interface Fields {
+        String COLD_WATER_BILL = "Холодная вода";
+        String CUSTOMER_ID = "ID заказчика";
+        String DATE = "Дата";
+        String GAZ_BILL = "Газ";
+        String HOT_WATER_BILL = "Горячая вода";
+        String ID = "ID";
+        String LIGHT_BILL = "Свет";
+        String TARIFF_ID = "ID тарифа";
     }
 }

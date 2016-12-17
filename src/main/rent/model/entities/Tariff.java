@@ -1,5 +1,7 @@
 package rent.model.entities;
 
+import javafx.scene.control.TableView;
+import rent.application.utils.JavaFxUtil;
 import rent.interfaces.IEntity;
 
 import javax.persistence.*;
@@ -64,6 +66,11 @@ public class Tariff implements IEntity {
         return mId;
     }
 
+    @Override
+    public TableView getTableView() {
+        return JavaFxUtil.createTable(Fields.ID, Fields.NAME, Fields.AMOUNT, Fields.DATE);
+    }
+
     public Tariff setId(Long pId) {
         mId = pId;
         return this;
@@ -77,5 +84,12 @@ public class Tariff implements IEntity {
     public Tariff setName(String pName) {
         mName = pName;
         return this;
+    }
+
+    private interface Fields {
+        String AMOUNT = "Значение";
+        String DATE = "Дата";
+        String ID = "ID";
+        String NAME = "Наименование";
     }
 }

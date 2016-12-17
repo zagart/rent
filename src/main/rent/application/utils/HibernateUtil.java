@@ -1,4 +1,4 @@
-package rent.utils;
+package rent.application.utils;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

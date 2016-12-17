@@ -3,7 +3,7 @@ package rent.model.dao;
 import org.hibernate.query.Query;
 import rent.interfaces.IDao;
 import rent.interfaces.IEntity;
-import rent.utils.ReflectionUtil;
+import rent.application.utils.ReflectionUtil;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static rent.utils.HibernateUtil.getCurrentSession;
+import static rent.application.utils.HibernateUtil.getCurrentSession;
 
 /**
  * Abstract Hibernate DAO class implementation.

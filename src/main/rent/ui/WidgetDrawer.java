@@ -1,24 +1,24 @@
 package rent.ui;
 
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.RadialGradientBuilder;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.*;
+import javafx.scene.transform.Rotate;
 import javafx.scene.transform.RotateBuilder;
-import javafx.stage.Stage;
 
 /**
+ * Class which is responsible for creating meter widget.
+ *
  * @author zagart
  */
 @SuppressWarnings("deprecation")
-public class WidgetDrawer {
+class WidgetDrawer {
+    private static final byte PIVOT_X = 100;
+    private static final byte PIVOT_Y = 100;
     private static final byte UNIT = 100;
 
     private Node arrow(double stretchRelativeToRim, Color color, int startAngle) {
@@ -30,19 +30,12 @@ public class WidgetDrawer {
                         new LineTo(UNIT * 0.9, UNIT * 0.9),
                         new LineTo(UNIT, stretchRelativeToRim),
                         new LineTo(UNIT * 1.1, UNIT * 0.9),
-                        new LineTo(UNIT, UNIT)
-                )
-                .transforms(
-                        RotateBuilder.create()
-                                .pivotX(UNIT)
-                                .pivotY(UNIT)
-                                .angle(startAngle)
-                                .build()
-                )
+                        new LineTo(UNIT, UNIT))
+                .transforms(new Rotate(startAngle, PIVOT_X, PIVOT_Y))
                 .build();
     }
 
-    public Node centerPoint() {
+    Node centerPoint() {
         return CircleBuilder.create()
                 .fill(Color.BLACK)
                 .radius(0.05 * UNIT)
@@ -51,11 +44,11 @@ public class WidgetDrawer {
                 .build();
     }
 
-    public Node getArrowNode(final int pAngle) {
+    Node getArrowNode(final int pAngle) {
         return arrow(UNIT * 0.2, Color.BLACK, pAngle);
     }
 
-    public Node marks() {
+    Node marks() {
         Group tickMarkGroup = new Group();
         for (int n = 0; n < 12; n++) {
             tickMarkGroup.getChildren().add(step(n));
@@ -63,14 +56,7 @@ public class WidgetDrawer {
         return tickMarkGroup;
     }
 
-    private EventHandler<MouseEvent> moveWhenDragging(final Stage stage) {
-        return mouseEvent -> {
-            stage.setX(mouseEvent.getScreenX() - stage.getWidth() / 2);
-            stage.setY(mouseEvent.getScreenY() - stage.getHeight() / 2);
-        };
-    }
-
-    public Node outerRim() {
+    Node outerRim() {
         return CircleBuilder.create()
                 .fill(
                         RadialGradientBuilder.create()
@@ -91,22 +77,6 @@ public class WidgetDrawer {
                 .centerX(UNIT)
                 .centerY(UNIT)
                 .build();
-    }
-
-    private EventHandler<ScrollEvent> scaleWhenScrolling(final Stage stage, final Parent root) {
-        return scrollEvent -> {
-            double scroll = scrollEvent.getDeltaY();
-            root.setScaleX(root.getScaleX() + scroll / 100);
-            root.setScaleY(root.getScaleY() + scroll / 100);
-            root.setTranslateX(root.getTranslateX() + scroll);
-            root.setTranslateY(root.getTranslateY() + scroll);
-            stage.sizeToScene();
-        };
-    }
-
-    public void setUpMouseForScaleAndMove(final Stage stage, final Parent root) {
-        root.onMouseDraggedProperty().set(moveWhenDragging(stage));
-        root.onScrollProperty().set(scaleWhenScrolling(stage, root));
     }
 
     private Node step(int n) {
