@@ -1,4 +1,4 @@
-package rent.ui;
+package rent.ui.main;
 
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -16,7 +16,7 @@ import javafx.scene.transform.RotateBuilder;
  * @author zagart
  */
 @SuppressWarnings("deprecation")
-class WidgetDrawer {
+public class WidgetDrawer {
     private static final byte PIVOT_X = 100;
     private static final byte PIVOT_Y = 100;
     private static final byte UNIT = 100;
@@ -35,7 +35,7 @@ class WidgetDrawer {
                 .build();
     }
 
-    Node centerPoint() {
+    public Node centerPoint() {
         return CircleBuilder.create()
                 .fill(Color.BLACK)
                 .radius(0.05 * UNIT)
@@ -44,11 +44,11 @@ class WidgetDrawer {
                 .build();
     }
 
-    Node getArrowNode(final int pAngle) {
+    public Node getArrowNode(final int pAngle) {
         return arrow(UNIT * 0.2, Color.BLACK, pAngle);
     }
 
-    Node marks() {
+    public Node marks() {
         Group tickMarkGroup = new Group();
         for (int n = 0; n < 12; n++) {
             tickMarkGroup.getChildren().add(step(n));
@@ -56,7 +56,7 @@ class WidgetDrawer {
         return tickMarkGroup;
     }
 
-    Node outerRim() {
+    public Node outerRim() {
         return CircleBuilder.create()
                 .fill(
                         RadialGradientBuilder.create()

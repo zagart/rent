@@ -1,4 +1,4 @@
-package rent.ui;
+package rent.ui.main;
 
 public class Controller {
 }

@@ -1,10 +1,13 @@
 package rent.model.entities;
 
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import rent.application.utils.JavaFxUtil;
 import rent.interfaces.IEntity;
+import rent.ui.entities.UiBill;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -14,7 +17,8 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "bill", catalog = "rent")
-public class Bill implements IEntity {
+public class Bill implements IEntity<UiBill> {
+    public static final String MENU_NAME = "Начисления";
     private Date mBillDate;
     private Long mColdWaterBill;
     private Customer mCustomer;
@@ -23,6 +27,50 @@ public class Bill implements IEntity {
     private Long mId;
     private Long mLightBill;
     private Tariff mTariff;
+
+    @Override
+    public UiBill createTableModel() {
+        return new UiBill(this);
+    }
+
+    @Override
+    public TableView<UiBill> createTableView() {
+        final ArrayList<PropertyValueFactory> factories = new ArrayList<PropertyValueFactory>() {
+            {
+                add(new PropertyValueFactory<UiBill, String>(UiBill.Fields.ID));
+                add(new PropertyValueFactory<UiBill, String>(UiBill.Fields.CUSTOMER_ID));
+                add(new PropertyValueFactory<UiBill, String>(UiBill.Fields.TARIFF_ID));
+                add(new PropertyValueFactory<UiBill, String>(UiBill.Fields.LIGHT_BILL));
+                add(new PropertyValueFactory<UiBill, String>(UiBill.Fields.GAZ_BILL));
+                add(new PropertyValueFactory<UiBill, String>(UiBill.Fields.COLD_WATER_BILL));
+                add(new PropertyValueFactory<UiBill, String>(UiBill.Fields.HOT_WATER_BILL));
+                add(new PropertyValueFactory<UiBill, String>(UiBill.Fields.DATE));
+            }
+        };
+        return JavaFxUtil.createTable(
+                factories,
+                Fields.ID,
+                Fields.CUSTOMER_ID,
+                Fields.TARIFF_ID,
+                Fields.LIGHT_BILL,
+                Fields.GAZ_BILL,
+                Fields.COLD_WATER_BILL,
+                Fields.HOT_WATER_BILL,
+                Fields.DATE);
+    }
+
+    @Override
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    public Long getId() {
+        return mId;
+    }
+
+    public Bill setId(Long pId) {
+        mId = pId;
+        return this;
+    }
 
     @Temporal(TemporalType.DATE)
     @Column(name = "date", nullable = false)
@@ -45,7 +93,7 @@ public class Bill implements IEntity {
         return this;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Customer.class)
+    @ManyToOne(fetch = FetchType.EAGER, targetEntity = Customer.class)
     @JoinColumn(name = "customer_id")
     public Customer getCustomer() {
         return mCustomer;
@@ -76,31 +124,6 @@ public class Bill implements IEntity {
         return this;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    public Long getId() {
-        return mId;
-    }
-
-    @Override
-    public TableView getTableView() {
-        return JavaFxUtil.createTable(
-                Fields.ID,
-                Fields.CUSTOMER_ID,
-                Fields.TARIFF_ID,
-                Fields.LIGHT_BILL,
-                Fields.GAZ_BILL,
-                Fields.COLD_WATER_BILL,
-                Fields.HOT_WATER_BILL,
-                Fields.DATE);
-    }
-
-    public Bill setId(Long pId) {
-        mId = pId;
-        return this;
-    }
-
     @Column(name = "light", nullable = false)
     public Long getLightBill() {
         return mLightBill;
@@ -111,7 +134,7 @@ public class Bill implements IEntity {
         return this;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Tariff.class)
+    @ManyToOne(fetch = FetchType.EAGER, targetEntity = Tariff.class)
     @JoinColumn(name = "tariff_id")
     public Tariff getTariff() {
         return mTariff;

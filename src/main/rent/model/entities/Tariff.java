@@ -1,8 +1,10 @@
 package rent.model.entities;
 
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import rent.application.utils.JavaFxUtil;
 import rent.interfaces.IEntity;
+import rent.ui.entities.UiTariff;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,7 +18,8 @@ import java.util.List;
  */
 @Entity
 @Table(name = "tariff", catalog = "rent")
-public class Tariff implements IEntity {
+public class Tariff implements IEntity<UiTariff> {
+    public static final String MENU_NAME = "Тарифы";
     private Long mAmount;
     private List<Bill> mBillList = new ArrayList<>();
     private Date mDate;
@@ -26,6 +29,37 @@ public class Tariff implements IEntity {
     public void addBill(final Bill pBill) {
         mBillList.add(pBill);
         pBill.setTariff(this);
+    }
+
+    @Override
+    public UiTariff createTableModel() {
+        return new UiTariff(this);
+    }
+
+    @Override
+    public TableView<UiTariff> createTableView() {
+        final ArrayList<PropertyValueFactory> factories = new ArrayList<PropertyValueFactory>() {
+            {
+                add(new PropertyValueFactory<UiTariff, String>(UiTariff.Fields.ID));
+                add(new PropertyValueFactory<UiTariff, String>(UiTariff.Fields.NAME));
+                add(new PropertyValueFactory<UiTariff, String>(UiTariff.Fields.AMOUNT));
+                add(new PropertyValueFactory<UiTariff, String>(UiTariff.Fields.DATE));
+            }
+        };
+        return JavaFxUtil.createTable(factories, Fields.ID, Fields.NAME, Fields.AMOUNT, Fields.DATE);
+    }
+
+    @Override
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    public Long getId() {
+        return mId;
+    }
+
+    public Tariff setId(Long pId) {
+        mId = pId;
+        return this;
     }
 
     @Column(name = "amount", nullable = false)
@@ -56,23 +90,6 @@ public class Tariff implements IEntity {
 
     public Tariff setDate(Date pDate) {
         mDate = pDate;
-        return this;
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    public Long getId() {
-        return mId;
-    }
-
-    @Override
-    public TableView getTableView() {
-        return JavaFxUtil.createTable(Fields.ID, Fields.NAME, Fields.AMOUNT, Fields.DATE);
-    }
-
-    public Tariff setId(Long pId) {
-        mId = pId;
         return this;
     }
 

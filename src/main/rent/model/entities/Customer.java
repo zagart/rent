@@ -1,8 +1,10 @@
 package rent.model.entities;
 
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import rent.application.utils.JavaFxUtil;
 import rent.interfaces.IEntity;
+import rent.ui.entities.UiCustomer;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -15,7 +17,8 @@ import java.util.List;
  */
 @Entity
 @Table(name = "customer", catalog = "rent")
-public class Customer implements IEntity {
+public class Customer implements IEntity<UiCustomer> {
+    public static final String MENU_NAME = "Заказчики";
     private String mAddress;
     private List<Bill> mBillList = new ArrayList<>();
     private List<Expense> mExpenseList = new ArrayList<>();
@@ -45,6 +48,46 @@ public class Customer implements IEntity {
     public void addPayment(final Payment pPayment) {
         mPaymentList.add(pPayment);
         pPayment.setCustomer(this);
+    }
+
+    @Override
+    public UiCustomer createTableModel() {
+        return new UiCustomer(this);
+    }
+
+    @Override
+    public TableView<UiCustomer> createTableView() {
+        final ArrayList<PropertyValueFactory> factories = new ArrayList<PropertyValueFactory>() {
+            {
+                add(new PropertyValueFactory<UiCustomer, String>(UiCustomer.Fields.ID));
+                add(new PropertyValueFactory<UiCustomer, String>(UiCustomer.Fields.FIRST_NAME));
+                add(new PropertyValueFactory<UiCustomer, String>(UiCustomer.Fields.LAST_NAME));
+                add(new PropertyValueFactory<UiCustomer, String>(UiCustomer.Fields.PATRONYMIC));
+                add(new PropertyValueFactory<UiCustomer, String>(UiCustomer.Fields.ADDRESS));
+                add(new PropertyValueFactory<UiCustomer, String>(UiCustomer.Fields.PHONE_NUMBER));
+            }
+        };
+        return JavaFxUtil.createTable(
+                factories,
+                Fields.ID,
+                Fields.FIRST_NAME,
+                Fields.LAST_NAME,
+                Fields.PATRONYMIC,
+                Fields.ADDRESS,
+                Fields.PHONE_NUMBER);
+    }
+
+    @Override
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    public Long getId() {
+        return mId;
+    }
+
+    public Customer setId(Long pId) {
+        mId = pId;
+        return this;
     }
 
     @Column(name = "address")
@@ -84,24 +127,6 @@ public class Customer implements IEntity {
 
     public Customer setFirstName(String pFirstName) {
         mFirstName = pFirstName;
-        return this;
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    public Long getId() {
-        return mId;
-    }
-
-    @Override
-    public TableView getTableView() {
-        return JavaFxUtil.createTable(
-                Fields.ID, Fields.FIRST_NAME, Fields.LAST_NAME, Fields.PATRONYMIC, Fields.ADDRESS, Fields.PHONE_NUMBER);
-    }
-
-    public Customer setId(Long pId) {
-        mId = pId;
         return this;
     }
 
@@ -154,7 +179,7 @@ public class Customer implements IEntity {
         return this;
     }
 
-    private interface Fields {
+    public interface Fields {
         String ADDRESS = "Адрес";
         String FIRST_NAME = "Имя";
         String ID = "ID";

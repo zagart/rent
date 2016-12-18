@@ -1,10 +1,13 @@
 package rent.model.entities;
 
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import rent.application.utils.JavaFxUtil;
 import rent.interfaces.IEntity;
+import rent.ui.entities.UiExpense;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -14,7 +17,8 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "expense", catalog = "rent")
-public class Expense implements IEntity {
+public class Expense implements IEntity<UiExpense> {
+    public static final String MENU_NAME = "Показания";
     private Long mColdWaterExpense;
     private Customer mCustomer;
     private Date mExpenseDate;
@@ -22,6 +26,47 @@ public class Expense implements IEntity {
     private Long mHotWaterExpense;
     private Long mId;
     private Long mLightExpense;
+
+    @Override
+    public UiExpense createTableModel() {
+        return new UiExpense(this);
+    }
+
+    @Override
+    public TableView<UiExpense> createTableView() {
+        final ArrayList<PropertyValueFactory> factories = new ArrayList<PropertyValueFactory>() {
+            {
+                add(new PropertyValueFactory<UiExpense, String>(UiExpense.Fields.ID));
+                add(new PropertyValueFactory<UiExpense, String>(UiExpense.Fields.CUSTOMER_ID));
+                add(new PropertyValueFactory<UiExpense, String>(UiExpense.Fields.LIGHT_EXPENSE));
+                add(new PropertyValueFactory<UiExpense, String>(UiExpense.Fields.GAZ_EXPENSE));
+                add(new PropertyValueFactory<UiExpense, String>(UiExpense.Fields.COLD_WATER_EXPENSE));
+                add(new PropertyValueFactory<UiExpense, String>(UiExpense.Fields.HOT_WATER_EXPENSE));
+                add(new PropertyValueFactory<UiExpense, String>(UiExpense.Fields.DATE));
+            }
+        };
+        return JavaFxUtil.createTable(
+                factories,
+                Fields.ID,
+                Fields.CUSTOMER_ID,
+                Fields.LIGHT_EXPENSE,
+                Fields.GAZ_EXPENSE,
+                Fields.COLD_WATER_EXPENSE,
+                Fields.HOT_WATER_EXPENSE,
+                Fields.DATE);
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    public Long getId() {
+        return mId;
+    }
+
+    public Expense setId(Long pId) {
+        mId = pId;
+        return this;
+    }
 
     @Column(name = "cold_water", nullable = false)
     public Long getColdWaterExpense() {
@@ -71,30 +116,6 @@ public class Expense implements IEntity {
 
     public Expense setHotWaterExpense(Long pHotWaterExpense) {
         mHotWaterExpense = pHotWaterExpense;
-        return this;
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    public Long getId() {
-        return mId;
-    }
-
-    @Override
-    public TableView getTableView() {
-        return JavaFxUtil.createTable(
-                Fields.ID,
-                Fields.CUSTOMER_ID,
-                Fields.LIGHT_EXPENSE,
-                Fields.GAZ_EXPENSE,
-                Fields.COLD_WATER_EXPENSE,
-                Fields.HOT_WATER_EXPENSE,
-                Fields.DATE);
-    }
-
-    public Expense setId(Long pId) {
-        mId = pId;
         return this;
     }
 

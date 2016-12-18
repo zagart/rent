@@ -2,7 +2,6 @@ package rent.application;
 
 import rent.application.singletons.Context;
 import rent.model.entities.*;
-import rent.model.services.impl.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,7 +20,7 @@ public class DatabaseLoader {
     private static final String CHEAP = "Дешевый";
     private static final int CUSTOMERS_THRESHOLD = 10;
     private static final int EXPENSES_THRESHOLD = 30;
-    public static final int EXPENSE_BOUND = 1000;
+    private static final int EXPENSE_BOUND = 1000;
     private static final String EXPENSIVE = "Дорогой";
     private static final int HOUSE_INDEX_BOUND = 50;
     private static final int PAYMENTS_THRESHOLD = 30;
@@ -98,18 +97,18 @@ public class DatabaseLoader {
             paymentCounter = bindPayments(
                     customer,
                     pPayments,
-                    random.nextInt(2 + PAYMENTS_THRESHOLD / CUSTOMERS_THRESHOLD),
+                    random.nextInt(1 + PAYMENTS_THRESHOLD / CUSTOMERS_THRESHOLD),
                     paymentCounter);
             billCounter = bindBills(
                     customer,
                     pBills,
-                    random.nextInt(2 + BILLS_THRESHOLD / CUSTOMERS_THRESHOLD),
+                    random.nextInt(1 + BILLS_THRESHOLD / CUSTOMERS_THRESHOLD),
                     billCounter
             );
             expenseCounter = bindExpenses(
                     customer,
                     pExpenses,
-                    random.nextInt(2 + EXPENSES_THRESHOLD / CUSTOMERS_THRESHOLD),
+                    random.nextInt(1 + EXPENSES_THRESHOLD / CUSTOMERS_THRESHOLD),
                     expenseCounter
             );
         }
@@ -156,6 +155,40 @@ public class DatabaseLoader {
             pCustomer.addPayment(pPayments.get(i));
         }
         return i;
+    }
+
+    private void cleanUpBadRecords(final List<Passport> pPassports,
+                                   final List<Expense> pExpenses,
+                                   final List<Bill> pBills,
+                                   final List<Payment> pPayments) {
+        for (int i = 0; i < pExpenses.size(); i++) {
+            final Expense expense = pExpenses.get(i);
+            if (expense.getCustomer() == null) {
+                pExpenses.remove(expense);
+                i--;
+            }
+        }
+        for (int i = 0; i < pPassports.size(); i++) {
+            final Passport passport = pPassports.get(i);
+            if (passport.getCustomer() == null) {
+                pPassports.remove(passport);
+                i--;
+            }
+        }
+        for (int i = 0; i < pBills.size(); i++) {
+            final Bill bill = pBills.get(i);
+            if (bill.getCustomer() == null) {
+                pBills.remove(bill);
+                i--;
+            }
+        }
+        for (int i = 0; i < pPayments.size(); i++) {
+            final Payment payment = pPayments.get(i);
+            if (payment.getCustomer() == null) {
+                pPayments.remove(payment);
+                i--;
+            }
+        }
     }
 
     private List<Bill> createBills() {
@@ -261,6 +294,7 @@ public class DatabaseLoader {
         };
     }
 
+    @SuppressWarnings("unchecked")
     private void loadDatabase() {
         final List<Tariff> tariffs = createTariffs();
         final List<Payment> payments = createPayments();
@@ -269,12 +303,13 @@ public class DatabaseLoader {
         final List<Bill> bills = createBills();
         final List<Customer> customers = createCustomers();
         associateKeys(tariffs, payments, passports, expenses, bills, customers);
-        Context.<CustomerService>getService(Customer.class).batchSave(customers);
-        Context.<TariffService>getService(Tariff.class).batchSave(tariffs);
-        Context.<ExpenseService>getService(Expense.class).batchSave(expenses);
-        Context.<BillService>getService(Bill.class).batchSave(bills);
-        Context.<PaymentService>getService(Payment.class).batchSave(payments);
-        Context.<PassportService>getService(Passport.class).batchSave(passports);
+        cleanUpBadRecords(passports, expenses, bills, payments);
+        Context.getService(Customer.class).batchSave(customers);
+        Context.getService(Tariff.class).batchSave(tariffs);
+        Context.getService(Passport.class).batchSave(passports);
+        Context.getService(Expense.class).batchSave(expenses);
+        Context.getService(Bill.class).batchSave(bills);
+        Context.getService(Payment.class).batchSave(payments);
     }
 
     private static class SingletonHolder {

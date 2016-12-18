@@ -1,4 +1,4 @@
-package rent.ui;
+package rent.ui.managers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,6 +14,8 @@ import javafx.stage.Stage;
 import rent.application.utils.ReflectionUtil;
 import rent.interfaces.IEntity;
 import rent.model.entities.*;
+import rent.model.services.GenericService;
+import rent.ui.main.WidgetDrawer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -27,7 +29,10 @@ import java.util.Random;
 public class UIManager {
     private static final int MAX_ANGLE = 360;
     private static final int MIN_ANGLE = 0;
+    private static final int SELECTION_WINDOW_HEIGHT = 140;
+    private static final int SELECTION_WINDOW_WIDTH = 100;
     private static final int TABLE_POSITION = 1;
+    final private GenericService mManager = new GenericService();
     private Node mArrow;
     private WidgetDrawer mDrawer = new WidgetDrawer();
     private FlowPane mRoot = new FlowPane();
@@ -52,42 +57,45 @@ public class UIManager {
 
     private TableView getTableView(final Class<?> pClass) {
         final IEntity entity = (IEntity) ReflectionUtil.createGenericObject(pClass);
-        return entity.getTableView();
+        return entity.createTableView();
     }
 
     private ListView<String> getTablesList() {
         return new ListView<String>() {
             {
                 setItems(FXCollections.observableArrayList(
-                        "Показания",
-                        "Заказчики",
-                        "Начисления",
-                        "Тарифы",
-                        "Платежи"));
-                setPrefSize(100, 117);
+                        Expense.MENU_NAME,
+                        Customer.MENU_NAME,
+                        Bill.MENU_NAME,
+                        Tariff.MENU_NAME,
+                        Payment.MENU_NAME,
+                        Passport.MENU_NAME));
+                setPrefSize(SELECTION_WINDOW_WIDTH, SELECTION_WINDOW_HEIGHT);
                 setOnMouseClicked((pEvent) -> {
                     final ObservableList<Node> children = mRoot.getChildren();
                     children.remove(mTableView);
                     children.remove(mWidgetRoot);
                     switch (getSelectionModel().getSelectedIndex()) {
                         case 0:
-                            mTableView = getTableView(Expense.class);
+                            loadTableData(Expense.class);
                             showMeter();
                             break;
                         case 1:
-                            mTableView = getTableView(Customer.class);
+                            loadTableData(Customer.class);
                             break;
                         case 2:
-                            mTableView = getTableView(Bill.class);
+                            loadTableData(Bill.class);
                             break;
                         case 3:
-                            mTableView = getTableView(Tariff.class);
+                            loadTableData(Tariff.class);
                             break;
                         case 4:
-                            mTableView = getTableView(Payment.class);
+                            loadTableData(Payment.class);
+                            break;
+                        case 5:
+                            loadTableData(Passport.class);
                             break;
                     }
-                    children.add(TABLE_POSITION, mTableView);
                 });
             }
         };
@@ -101,6 +109,14 @@ public class UIManager {
         pStage.show();
     }
 
+    @SuppressWarnings("unchecked")
+    private <E extends IEntity> void loadTableData(final Class<E> pClass) {
+        final ObservableList observableList = mManager.getObservableList(pClass);
+        mTableView = getTableView(pClass);
+        mTableView.setItems(observableList);
+        mRoot.getChildren().add(TABLE_POSITION, mTableView);
+    }
+
     private void redrawArrow(final int pAngle) {
         mWidgetRoot.getChildren().remove(mArrow);
         mArrow = mDrawer.getArrowNode(pAngle);
@@ -111,8 +127,7 @@ public class UIManager {
         mRoot.setOrientation(Orientation.VERTICAL);
         mArrow = mDrawer.getArrowNode(MIN_ANGLE);
         mRoot.getChildren().add(getTablesList());
-        mTableView = getTableView(Expense.class);
-        mRoot.getChildren().add(mTableView);
+        loadTableData(Expense.class);
         showMeter();
         return mRoot;
     }

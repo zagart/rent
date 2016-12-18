@@ -1,5 +1,6 @@
 package rent.application.singletons;
 
+import rent.interfaces.IEntity;
 import rent.interfaces.IService;
 import rent.model.entities.*;
 import rent.model.services.impl.*;
@@ -35,8 +36,8 @@ public class Context {
      * @return {@link IService} implementation object
      */
     @SuppressWarnings("unchecked")
-    public static <T extends IService> T getService(final Class<?> pEntityClass) {
-        return (T) SingletonHolder.CONTEXT.mDaoRepository.get(pEntityClass);
+    public static <S extends IService, E extends IEntity> S getService(final Class<E> pEntityClass) {
+        return (S) SingletonHolder.CONTEXT.mDaoRepository.get(pEntityClass);
     }
 
     private static class SingletonHolder {
