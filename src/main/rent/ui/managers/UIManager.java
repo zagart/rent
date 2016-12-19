@@ -2,6 +2,8 @@ package rent.ui.managers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -11,15 +13,16 @@ import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
+import rent.application.DatabaseLoader;
 import rent.application.utils.ReflectionUtil;
 import rent.interfaces.IEntity;
 import rent.model.entities.*;
 import rent.model.services.GenericService;
+import rent.ui.entities.UiExpense;
 import rent.ui.main.WidgetDrawer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.Random;
 
 /**
  * Class for handling common UI operations.
@@ -27,8 +30,6 @@ import java.util.Random;
  * @author zagart
  */
 public class UIManager {
-    private static final int MAX_ANGLE = 360;
-    private static final int MIN_ANGLE = 0;
     private static final int SELECTION_WINDOW_HEIGHT = 140;
     private static final int SELECTION_WINDOW_WIDTH = 100;
     private static final int TABLE_POSITION = 1;
@@ -53,6 +54,13 @@ public class UIManager {
         } else {
             return null;
         }
+    }
+
+    private <L extends Event> EventHandler<L> getTableListener() {
+        return pEvent -> {
+            final UiExpense selectedExpense = (UiExpense) mTableView.getSelectionModel().getSelectedItem();
+            redrawArrow(Math.toIntExact(selectedExpense.getGazExpense()));
+        };
     }
 
     private TableView getTableView(final Class<?> pClass) {
@@ -117,15 +125,15 @@ public class UIManager {
         mRoot.getChildren().add(TABLE_POSITION, mTableView);
     }
 
-    private void redrawArrow(final int pAngle) {
+    private void redrawArrow(final int pValue) {
         mWidgetRoot.getChildren().remove(mArrow);
-        mArrow = mDrawer.getArrowNode(pAngle);
+        mArrow = mDrawer.getArrowNode(pValue);
         mWidgetRoot.getChildren().add(mArrow);
     }
 
     private FlowPane setUpGroup() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         mRoot.setOrientation(Orientation.VERTICAL);
-        mArrow = mDrawer.getArrowNode(MIN_ANGLE);
+        mArrow = mDrawer.getArrowNode(WidgetDrawer.MIN_ANGLE);
         mRoot.getChildren().add(getTablesList());
         loadTableData(Expense.class);
         showMeter();
@@ -134,6 +142,7 @@ public class UIManager {
 
     public void setUpStage(final Stage pStage)
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        mDrawer.setMaxValue(DatabaseLoader.EXPENSE_BOUND);
         setUpGroup();
         pStage.getIcons().add(getIcon());
         loadStage(pStage);
@@ -141,7 +150,9 @@ public class UIManager {
 
     private void showMeter() {
         mWidgetRoot = new Group(mDrawer.outerRim(), mArrow, mDrawer.marks(), mDrawer.centerPoint());
-        mWidgetRoot.setOnMouseClicked(pEvent -> redrawArrow(new Random().nextInt(MAX_ANGLE)));
+        final EventHandler<Event> tableListener = getTableListener();
+        mTableView.setOnMouseClicked(tableListener);
+        mTableView.setOnKeyReleased(tableListener);
         mRoot.getChildren().add(mWidgetRoot);
     }
 }

@@ -20,7 +20,7 @@ public class DatabaseLoader {
     private static final String CHEAP = "Дешевый";
     private static final int CUSTOMERS_THRESHOLD = 10;
     private static final int EXPENSES_THRESHOLD = 30;
-    private static final int EXPENSE_BOUND = 1000;
+    public static final int EXPENSE_BOUND = 1000;
     private static final String EXPENSIVE = "Дорогой";
     private static final int HOUSE_INDEX_BOUND = 50;
     private static final int PAYMENTS_THRESHOLD = 30;

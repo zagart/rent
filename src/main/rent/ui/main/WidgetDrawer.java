@@ -17,9 +17,12 @@ import javafx.scene.transform.RotateBuilder;
  */
 @SuppressWarnings("deprecation")
 public class WidgetDrawer {
+    public static final int MIN_ANGLE = 0;
+    private static final int MAX_ANGLE = 360;
     private static final byte PIVOT_X = 100;
     private static final byte PIVOT_Y = 100;
     private static final byte UNIT = 100;
+    private int mMaxValue = 1;
 
     private Node arrow(double stretchRelativeToRim, Color color, int startAngle) {
         return PathBuilder.create()
@@ -44,8 +47,10 @@ public class WidgetDrawer {
                 .build();
     }
 
-    public Node getArrowNode(final int pAngle) {
-        return arrow(UNIT * 0.2, Color.BLACK, pAngle);
+    public Node getArrowNode(final int pArrowValue) {
+        float degree = (float) MAX_ANGLE / mMaxValue;
+        final float actualValue = degree * pArrowValue;
+        return arrow(UNIT * 0.2, Color.BLACK, (int) actualValue);
     }
 
     public Node marks() {
@@ -77,6 +82,10 @@ public class WidgetDrawer {
                 .centerX(UNIT)
                 .centerY(UNIT)
                 .build();
+    }
+
+    public void setMaxValue(int pMaxValue) {
+        mMaxValue = pMaxValue;
     }
 
     private Node step(int n) {
