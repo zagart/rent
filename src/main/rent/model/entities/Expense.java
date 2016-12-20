@@ -1,13 +1,19 @@
 package rent.model.entities;
 
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
+import rent.application.managers.TableManager;
+import rent.application.singletons.Context;
+import rent.application.utils.ParseUtil;
+import rent.application.utils.UiUtil;
 import rent.interfaces.IEntity;
 import rent.ui.entities.UiExpense;
-import rent.application.managers.TableManager;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Entity for Expense model.
@@ -25,6 +31,33 @@ public class Expense implements IEntity<UiExpense> {
     private Long mHotWaterExpense;
     private Long mId;
     private Long mLightExpense;
+
+    @Override
+    public List<String> createFieldsList() {
+        return new ArrayList<String>() {
+            {
+                add(Fields.ID);
+                add(Fields.CUSTOMER_ID);
+                add(Fields.LIGHT_EXPENSE);
+                add(Fields.GAZ_EXPENSE);
+                add(Fields.COLD_WATER_EXPENSE);
+                add(Fields.HOT_WATER_EXPENSE);
+                add(Fields.DATE);
+            }
+        };
+    }
+
+    @Override
+    public Stage createModelEditStage() {
+        return UiUtil.getStageByFields(
+                Fields.ID,
+                Fields.CUSTOMER_ID,
+                Fields.LIGHT_EXPENSE,
+                Fields.GAZ_EXPENSE,
+                Fields.COLD_WATER_EXPENSE,
+                Fields.HOT_WATER_EXPENSE,
+                Fields.DATE);
+    }
 
     @Override
     public TableManager<UiExpense> createTableManager() {
@@ -53,6 +86,21 @@ public class Expense implements IEntity<UiExpense> {
     @Override
     public UiExpense createTableModel() {
         return new UiExpense(this);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public IEntity<UiExpense> extractEntityFromMap(final Map<String, String> pFields) {
+        mId = Long.valueOf(pFields.get(Fields.ID));
+        mCustomer = (Customer) Context
+                .getService(Customer.class)
+                .getById(Long.valueOf(pFields.get(Fields.CUSTOMER_ID)));
+        mLightExpense = Long.valueOf(pFields.get(Fields.LIGHT_EXPENSE));
+        mGazExpense = Long.valueOf(pFields.get(Fields.GAZ_EXPENSE));
+        mColdWaterExpense = Long.valueOf(pFields.get(Fields.COLD_WATER_EXPENSE));
+        mHotWaterExpense = Long.valueOf(pFields.get(Fields.HOT_WATER_EXPENSE));
+        mExpenseDate = ParseUtil.parseStringToDate(pFields.get(Fields.DATE));
+        return this;
     }
 
     @Id

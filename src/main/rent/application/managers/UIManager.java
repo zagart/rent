@@ -8,12 +8,15 @@ import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import rent.application.DatabaseLoader;
 import rent.application.utils.ReflectionUtil;
+import rent.application.utils.UiUtil;
+import rent.constants.UiConstants;
 import rent.interfaces.IEntity;
 import rent.model.entities.*;
 import rent.model.services.GenericService;
@@ -21,7 +24,6 @@ import rent.ui.entities.UiExpense;
 import rent.ui.main.WidgetDrawer;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 
 /**
  * Class for handling common UI operations.
@@ -29,6 +31,7 @@ import java.net.URL;
  * @author zagart
  */
 public class UIManager {
+    private static final int BUTTON_WIDTH = 100;
     private static final int SELECTION_WINDOW_HEIGHT = 140;
     private static final int SELECTION_WINDOW_WIDTH = 100;
     private static final int TABLE_POSITION = 1;
@@ -44,15 +47,19 @@ public class UIManager {
         mWindowTitle = pWindowTitle;
     }
 
-    private Image getIcon() {
-        final URL path = getClass().getClassLoader().getResource("resources/icon.png");
-        final String iconPath;
-        if (path != null) {
-            iconPath = path.toString();
-            return new Image(iconPath);
-        } else {
-            return null;
-        }
+    private VBox getCrudMenu() {
+        final VBox crudMenu = new VBox();
+        final Button addButton = new Button(UiConstants.ADD);
+        final Button editButton = new Button(UiConstants.EDIT);
+        final Button deleteButton = new Button(UiConstants.DELETE);
+        addButton.setOnMouseClicked((pEvent) -> mTableManager.addRow());
+        deleteButton.setOnMouseClicked((pEvent) -> mTableManager.deleteRow());
+        editButton.setOnMouseClicked((pEvent) -> mTableManager.editRow());
+        setUpButtons(addButton, editButton, deleteButton);
+        crudMenu.getChildren().add(addButton);
+        crudMenu.getChildren().add(editButton);
+        crudMenu.getChildren().add(deleteButton);
+        return crudMenu;
     }
 
     private <L extends Event> EventHandler<L> getTableListener() {
@@ -64,11 +71,11 @@ public class UIManager {
 
     private TableManager getTableManager(final Class<?> pClass) {
         final IEntity entity = (IEntity) ReflectionUtil.createGenericObject(pClass);
-        return entity.createTableManager();
+        return entity.createTableManager().setUiManager(this);
     }
 
-    private ListView<String> getTablesList() {
-        return new ListView<String>() {
+    private VBox getTablesList() {
+        final ListView<String> menuItems = new ListView<String>() {
             {
                 setItems(FXCollections.observableArrayList(
                         Expense.MENU_NAME,
@@ -79,33 +86,31 @@ public class UIManager {
                         Passport.MENU_NAME));
                 setPrefSize(SELECTION_WINDOW_WIDTH, SELECTION_WINDOW_HEIGHT);
                 setOnMouseClicked((pEvent) -> {
-                    final ObservableList<Node> children = mRoot.getChildren();
-                    children.remove(mTableManager);
-                    children.remove(mWidgetRoot);
                     switch (getSelectionModel().getSelectedIndex()) {
                         case 0:
-                            loadTableData(Expense.class);
+                            reloadTableData(Expense.class);
                             showMeter();
                             break;
                         case 1:
-                            loadTableData(Customer.class);
+                            reloadTableData(Customer.class);
                             break;
                         case 2:
-                            loadTableData(Bill.class);
+                            reloadTableData(Bill.class);
                             break;
                         case 3:
-                            loadTableData(Tariff.class);
+                            reloadTableData(Tariff.class);
                             break;
                         case 4:
-                            loadTableData(Payment.class);
+                            reloadTableData(Payment.class);
                             break;
                         case 5:
-                            loadTableData(Passport.class);
+                            reloadTableData(Passport.class);
                             break;
                     }
                 });
             }
         };
+        return new VBox(menuItems, getCrudMenu());
     }
 
     private void loadStage(final Stage pStage) {
@@ -116,25 +121,34 @@ public class UIManager {
         pStage.show();
     }
 
-    @SuppressWarnings("unchecked")
-    private <E extends IEntity> void loadTableData(final Class<E> pClass) {
-        final ObservableList observableList = mManager.getObservableList(pClass);
-        mTableManager = getTableManager(pClass);
-        mTableManager.setItems(observableList);
-        mRoot.getChildren().add(TABLE_POSITION, mTableManager);
-    }
-
     private void redrawArrow(final int pValue) {
         mWidgetRoot.getChildren().remove(mArrow);
         mArrow = mDrawer.getArrowNode(pValue);
         mWidgetRoot.getChildren().add(mArrow);
     }
 
+    @SuppressWarnings("unchecked")
+    public <E extends IEntity> void reloadTableData(final Class<E> pClass) {
+        final ObservableList<Node> children = mRoot.getChildren();
+        children.remove(mTableManager);
+        children.remove(mWidgetRoot);
+        final ObservableList observableList = mManager.getObservableList(pClass);
+        mTableManager = getTableManager(pClass);
+        mTableManager.setItems(observableList);
+        children.add(TABLE_POSITION, mTableManager);
+    }
+
+    private void setUpButtons(final Button... pButtons) {
+        for (final Button button : pButtons) {
+            button.setPrefWidth(BUTTON_WIDTH);
+        }
+    }
+
     private FlowPane setUpGroup() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         mRoot.setOrientation(Orientation.VERTICAL);
         mArrow = mDrawer.getArrowNode(WidgetDrawer.MIN_ANGLE);
         mRoot.getChildren().add(getTablesList());
-        loadTableData(Expense.class);
+        reloadTableData(Expense.class);
         showMeter();
         return mRoot;
     }
@@ -143,7 +157,7 @@ public class UIManager {
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         mDrawer.setMaxValue(DatabaseLoader.EXPENSE_BOUND);
         setUpGroup();
-        pStage.getIcons().add(getIcon());
+        pStage.getIcons().add(UiUtil.getIcon());
         loadStage(pStage);
     }
 

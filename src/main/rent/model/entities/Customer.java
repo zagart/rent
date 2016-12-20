@@ -1,13 +1,16 @@
 package rent.model.entities;
 
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
+import rent.application.managers.TableManager;
+import rent.application.utils.UiUtil;
 import rent.interfaces.IEntity;
 import rent.ui.entities.UiCustomer;
-import rent.application.managers.TableManager;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Entity for Customer model.
@@ -50,6 +53,31 @@ public class Customer implements IEntity<UiCustomer> {
     }
 
     @Override
+    public List<String> createFieldsList() {
+        return new ArrayList<String>() {
+            {
+                add(Fields.ID);
+                add(Fields.FIRST_NAME);
+                add(Fields.LAST_NAME);
+                add(Fields.PATRONYMIC);
+                add(Fields.ADDRESS);
+                add(Fields.PHONE_NUMBER);
+            }
+        };
+    }
+
+    @Override
+    public Stage createModelEditStage() {
+        return UiUtil.getStageByFields(
+                Fields.ID,
+                Fields.FIRST_NAME,
+                Fields.LAST_NAME,
+                Fields.PATRONYMIC,
+                Fields.ADDRESS,
+                Fields.PHONE_NUMBER);
+    }
+
+    @Override
     public TableManager<UiCustomer> createTableManager() {
         final ArrayList<PropertyValueFactory> factories = new ArrayList<PropertyValueFactory>() {
             {
@@ -74,6 +102,17 @@ public class Customer implements IEntity<UiCustomer> {
     @Override
     public UiCustomer createTableModel() {
         return new UiCustomer(this);
+    }
+
+    @Override
+    public IEntity<UiCustomer> extractEntityFromMap(final Map<String, String> pFields) {
+        mId = Long.valueOf(pFields.get(Fields.ID));
+        mFirstName = pFields.get(Fields.FIRST_NAME);
+        mLastName = pFields.get(Fields.LAST_NAME);
+        mPatronymic = pFields.get(Fields.PATRONYMIC);
+        mAddress = pFields.get(Fields.ADDRESS);
+        mPhoneNumber = pFields.get(Fields.PHONE_NUMBER);
+        return this;
     }
 
     @Override

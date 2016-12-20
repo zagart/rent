@@ -1,13 +1,19 @@
 package rent.model.entities;
 
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
+import rent.application.managers.TableManager;
+import rent.application.singletons.Context;
+import rent.application.utils.ParseUtil;
+import rent.application.utils.UiUtil;
 import rent.interfaces.IEntity;
 import rent.ui.entities.UiBill;
-import rent.application.managers.TableManager;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Entity for Bill model.
@@ -26,6 +32,36 @@ public class Bill implements IEntity<UiBill> {
     private Long mId;
     private Long mLightBill;
     private Tariff mTariff;
+
+    @Override
+    public List<String> createFieldsList() {
+        return new ArrayList<String>() {
+            {
+                add(Fields.ID);
+                add(Fields.CUSTOMER_ID);
+                add(Fields.TARIFF_ID);
+                add(Fields.LIGHT_BILL);
+                add(Fields.GAZ_BILL);
+                add(Fields.GAZ_BILL);
+                add(Fields.COLD_WATER_BILL);
+                add(Fields.HOT_WATER_BILL);
+                add(Fields.DATE);
+            }
+        };
+    }
+
+    @Override
+    public Stage createModelEditStage() {
+        return UiUtil.getStageByFields(
+                Fields.ID,
+                Fields.CUSTOMER_ID,
+                Fields.TARIFF_ID,
+                Fields.LIGHT_BILL,
+                Fields.GAZ_BILL,
+                Fields.COLD_WATER_BILL,
+                Fields.HOT_WATER_BILL,
+                Fields.DATE);
+    }
 
     @Override
     public TableManager<UiBill> createTableManager() {
@@ -56,6 +92,21 @@ public class Bill implements IEntity<UiBill> {
     @Override
     public UiBill createTableModel() {
         return new UiBill(this);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public IEntity<UiBill> extractEntityFromMap(final Map<String, String> pFields) {
+        mId = Long.valueOf(pFields.get(Fields.ID));
+        mCustomer = (Customer) Context
+                .getService(Customer.class)
+                .getById(Long.valueOf(pFields.get(Fields.CUSTOMER_ID)));
+        mTariff = (Tariff) Context.getService(Tariff.class).getById(Long.valueOf(pFields.get(Fields.TARIFF_ID)));
+        mLightBill = Long.valueOf(pFields.get(Fields.LIGHT_BILL));
+        mGazBill = Long.valueOf(pFields.get(Fields.GAZ_BILL));
+        mHotWaterBill = Long.valueOf(pFields.get(Fields.HOT_WATER_BILL));
+        mBillDate = ParseUtil.parseStringToDate(pFields.get(Fields.DATE));
+        return this;
     }
 
     @Override

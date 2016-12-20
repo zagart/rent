@@ -1,13 +1,19 @@
 package rent.model.entities;
 
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
+import rent.application.managers.TableManager;
+import rent.application.singletons.Context;
+import rent.application.utils.ParseUtil;
+import rent.application.utils.UiUtil;
 import rent.interfaces.IEntity;
 import rent.ui.entities.UiPassport;
-import rent.application.managers.TableManager;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Entity for Passport model.
@@ -24,6 +30,31 @@ public class Passport implements IEntity<UiPassport> {
     private Long mId;
     private String mIssuedBy;
     private String mPersonalNumber;
+
+    @Override
+    public List<String> createFieldsList() {
+        return new ArrayList<String>() {
+            {
+                add(Fields.ID);
+                add(Fields.CUSTOMER_ID);
+                add(Fields.PERSONAL_NUMBER);
+                add(Fields.DATE_OF_ISSUE);
+                add(Fields.EXPIRATION_DATE);
+                add(Fields.ISSUED_BY);
+            }
+        };
+    }
+
+    @Override
+    public Stage createModelEditStage() {
+        return UiUtil.getStageByFields(
+                Fields.ID,
+                Fields.CUSTOMER_ID,
+                Fields.PERSONAL_NUMBER,
+                Fields.DATE_OF_ISSUE,
+                Fields.EXPIRATION_DATE,
+                Fields.ISSUED_BY);
+    }
 
     @Override
     public TableManager<UiPassport> createTableManager() {
@@ -50,6 +81,20 @@ public class Passport implements IEntity<UiPassport> {
     @Override
     public UiPassport createTableModel() {
         return new UiPassport(this);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public IEntity<UiPassport> extractEntityFromMap(final Map<String, String> pFields) {
+        mId = Long.valueOf(pFields.get(Fields.ID));
+        mCustomer = (Customer) Context
+                .getService(Customer.class)
+                .getById(Long.valueOf(pFields.get(Fields.CUSTOMER_ID)));
+        mPersonalNumber = pFields.get(Fields.PERSONAL_NUMBER);
+        mDateOfIssue = ParseUtil.parseStringToDate(pFields.get(Fields.DATE_OF_ISSUE));
+        mExpirationDate = ParseUtil.parseStringToDate(pFields.get(Fields.EXPIRATION_DATE));
+        mIssuedBy = pFields.get(Fields.ISSUED_BY);
+        return this;
     }
 
     @Id

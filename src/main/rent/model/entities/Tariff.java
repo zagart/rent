@@ -1,14 +1,18 @@
 package rent.model.entities;
 
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
+import rent.application.managers.TableManager;
+import rent.application.utils.ParseUtil;
+import rent.application.utils.UiUtil;
 import rent.interfaces.IEntity;
 import rent.ui.entities.UiTariff;
-import rent.application.managers.TableManager;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Entity for Tariff model.
@@ -31,6 +35,23 @@ public class Tariff implements IEntity<UiTariff> {
     }
 
     @Override
+    public List<String> createFieldsList() {
+        return new ArrayList<String>() {
+            {
+                add(Fields.ID);
+                add(Fields.NAME);
+                add(Fields.AMOUNT);
+                add(Fields.DATE);
+            }
+        };
+    }
+
+    @Override
+    public Stage createModelEditStage() {
+        return UiUtil.getStageByFields(Fields.ID, Fields.NAME, Fields.AMOUNT, Fields.DATE);
+    }
+
+    @Override
     public TableManager<UiTariff> createTableManager() {
         final ArrayList<PropertyValueFactory> factories = new ArrayList<PropertyValueFactory>() {
             {
@@ -46,6 +67,15 @@ public class Tariff implements IEntity<UiTariff> {
     @Override
     public UiTariff createTableModel() {
         return new UiTariff(this);
+    }
+
+    @Override
+    public IEntity<UiTariff> extractEntityFromMap(final Map<String, String> pFields) {
+        mId = Long.valueOf(pFields.get(Fields.ID));
+        mName = pFields.get(Fields.NAME);
+        mAmount = Long.valueOf(pFields.get(Fields.AMOUNT));
+        mDate = ParseUtil.parseStringToDate(pFields.get(Fields.DATE));
+        return this;
     }
 
     @Override
