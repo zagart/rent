@@ -1,10 +1,9 @@
 package rent.model.entities;
 
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import rent.application.utils.JavaFxUtil;
 import rent.interfaces.IEntity;
 import rent.ui.entities.UiExpense;
+import rent.application.managers.TableManager;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -28,12 +27,7 @@ public class Expense implements IEntity<UiExpense> {
     private Long mLightExpense;
 
     @Override
-    public UiExpense createTableModel() {
-        return new UiExpense(this);
-    }
-
-    @Override
-    public TableView<UiExpense> createTableView() {
+    public TableManager<UiExpense> createTableManager() {
         final ArrayList<PropertyValueFactory> factories = new ArrayList<PropertyValueFactory>() {
             {
                 add(new PropertyValueFactory<UiExpense, String>(UiExpense.Fields.ID));
@@ -45,7 +39,7 @@ public class Expense implements IEntity<UiExpense> {
                 add(new PropertyValueFactory<UiExpense, String>(UiExpense.Fields.DATE));
             }
         };
-        return JavaFxUtil.createTable(
+        return new TableManager<>(
                 factories,
                 Fields.ID,
                 Fields.CUSTOMER_ID,
@@ -54,6 +48,11 @@ public class Expense implements IEntity<UiExpense> {
                 Fields.COLD_WATER_EXPENSE,
                 Fields.HOT_WATER_EXPENSE,
                 Fields.DATE);
+    }
+
+    @Override
+    public UiExpense createTableModel() {
+        return new UiExpense(this);
     }
 
     @Id

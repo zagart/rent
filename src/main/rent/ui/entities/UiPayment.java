@@ -11,7 +11,8 @@ import rent.model.entities.Payment;
  *
  * @author zagart
  */
-public class UiPayment implements ITableModel<Long> {
+public class UiPayment implements ITableModel<Long, Payment> {
+    final private Payment mPayment;
     private SimpleLongProperty mAmount = new SimpleLongProperty();
     private SimpleLongProperty mBacklog = new SimpleLongProperty();
     private SimpleLongProperty mCustomerId = new SimpleLongProperty();
@@ -26,7 +27,40 @@ public class UiPayment implements ITableModel<Long> {
             mCustomerId.set(customer.getId());
             mId.set(pPayment.getId());
             mTimestamp.set(pPayment.getTimestamp().toString());
+            mPayment = pPayment;
+        } else {
+            mPayment = null;
         }
+    }
+
+    @Override
+    public Payment extractEntity() {
+        return mPayment;
+    }
+
+    @Override
+    public boolean equals(Object pO) {
+        if (this == pO) return true;
+        if (pO == null || getClass() != pO.getClass()) return false;
+        UiPayment uiPayment = (UiPayment) pO;
+        if (!mCustomerId.equals(uiPayment.mCustomerId)) return false;
+        return mId.equals(uiPayment.mId);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = mCustomerId.hashCode();
+        result = 31 * result + mId.hashCode();
+        return result;
+    }
+
+    @Override
+    public Long getId() {
+        return mId.get();
+    }
+
+    public void setId(long pId) {
+        this.mId.set(pId);
     }
 
     public long getAmount() {
@@ -51,15 +85,6 @@ public class UiPayment implements ITableModel<Long> {
 
     public void setCustomerId(long pCustomerId) {
         this.mCustomerId.set(pCustomerId);
-    }
-
-    @Override
-    public Long getId() {
-        return mId.get();
-    }
-
-    public void setId(long pId) {
-        this.mId.set(pId);
     }
 
     public String getTimestamp() {

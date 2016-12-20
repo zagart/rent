@@ -1,10 +1,9 @@
 package rent.model.entities;
 
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import rent.application.utils.JavaFxUtil;
 import rent.interfaces.IEntity;
 import rent.ui.entities.UiPayment;
+import rent.application.managers.TableManager;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -26,12 +25,7 @@ public class Payment implements IEntity<UiPayment> {
     private Date mTimestamp;
 
     @Override
-    public UiPayment createTableModel() {
-        return new UiPayment(this);
-    }
-
-    @Override
-    public TableView<UiPayment> createTableView() {
+    public TableManager<UiPayment> createTableManager() {
         final ArrayList<PropertyValueFactory> factories = new ArrayList<PropertyValueFactory>() {
             {
                 add(new PropertyValueFactory<UiPayment, String>(UiPayment.Fields.ID));
@@ -41,13 +35,18 @@ public class Payment implements IEntity<UiPayment> {
                 add(new PropertyValueFactory<UiPayment, String>(UiPayment.Fields.TIMESTAMP));
             }
         };
-        return JavaFxUtil.createTable(
+        return new TableManager<>(
                 factories,
                 Fields.ID,
                 Fields.CUSTOMER_ID,
                 Fields.AMOUNT,
                 Fields.BACKLOG,
                 Fields.TIMESTAMP);
+    }
+
+    @Override
+    public UiPayment createTableModel() {
+        return new UiPayment(this);
     }
 
     @Id

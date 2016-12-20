@@ -10,7 +10,8 @@ import rent.model.entities.Bill;
  *
  * @author zagart
  */
-public class UiBill implements ITableModel<Long> {
+public class UiBill implements ITableModel<Long, Bill> {
+    private Bill mBill;
     private SimpleStringProperty mBillDate = new SimpleStringProperty();
     private SimpleLongProperty mColdWaterBill = new SimpleLongProperty();
     private SimpleLongProperty mCustomerId = new SimpleLongProperty();
@@ -31,8 +32,39 @@ public class UiBill implements ITableModel<Long> {
                 mId.set(pBill.getId());
                 mLightBill.set(pBill.getLightBill());
                 mTariffId.set(pBill.getTariff().getId());
+                mBill = pBill;
             }
         }
+    }
+
+    @Override
+    public boolean equals(final Object pO) {
+        if (this == pO) return true;
+        if (pO == null || getClass() != pO.getClass()) return false;
+        UiBill uiBill = (UiBill) pO;
+        if (!mCustomerId.equals(uiBill.mCustomerId)) return false;
+        return mId.equals(uiBill.mId);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = mCustomerId.hashCode();
+        result = 31 * result + mId.hashCode();
+        return result;
+    }
+
+    @Override
+    public Bill extractEntity() {
+        return mBill;
+    }
+
+    @Override
+    public Long getId() {
+        return mId.get();
+    }
+
+    public void setId(long pId) {
+        this.mId.set(pId);
     }
 
     public SimpleLongProperty gazBillProperty() {
@@ -77,15 +109,6 @@ public class UiBill implements ITableModel<Long> {
 
     public void setHotWaterBill(long pHotWaterBill) {
         this.mHotWaterBill.set(pHotWaterBill);
-    }
-
-    @Override
-    public Long getId() {
-        return mId.get();
-    }
-
-    public void setId(long pId) {
-        this.mId.set(pId);
     }
 
     public long getLightBill() {

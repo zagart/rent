@@ -1,4 +1,4 @@
-package rent.ui.managers;
+package rent.application.managers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,7 +9,6 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
@@ -37,7 +36,7 @@ public class UIManager {
     private Node mArrow;
     private WidgetDrawer mDrawer = new WidgetDrawer();
     private FlowPane mRoot = new FlowPane();
-    private TableView mTableView;
+    private TableManager mTableManager;
     private Group mWidgetRoot;
     private String mWindowTitle = "Title";
 
@@ -58,14 +57,14 @@ public class UIManager {
 
     private <L extends Event> EventHandler<L> getTableListener() {
         return pEvent -> {
-            final UiExpense selectedExpense = (UiExpense) mTableView.getSelectionModel().getSelectedItem();
+            final UiExpense selectedExpense = (UiExpense) mTableManager.getSelectionModel().getSelectedItem();
             redrawArrow(Math.toIntExact(selectedExpense.getGazExpense()));
         };
     }
 
-    private TableView getTableView(final Class<?> pClass) {
+    private TableManager getTableManager(final Class<?> pClass) {
         final IEntity entity = (IEntity) ReflectionUtil.createGenericObject(pClass);
-        return entity.createTableView();
+        return entity.createTableManager();
     }
 
     private ListView<String> getTablesList() {
@@ -81,7 +80,7 @@ public class UIManager {
                 setPrefSize(SELECTION_WINDOW_WIDTH, SELECTION_WINDOW_HEIGHT);
                 setOnMouseClicked((pEvent) -> {
                     final ObservableList<Node> children = mRoot.getChildren();
-                    children.remove(mTableView);
+                    children.remove(mTableManager);
                     children.remove(mWidgetRoot);
                     switch (getSelectionModel().getSelectedIndex()) {
                         case 0:
@@ -120,9 +119,9 @@ public class UIManager {
     @SuppressWarnings("unchecked")
     private <E extends IEntity> void loadTableData(final Class<E> pClass) {
         final ObservableList observableList = mManager.getObservableList(pClass);
-        mTableView = getTableView(pClass);
-        mTableView.setItems(observableList);
-        mRoot.getChildren().add(TABLE_POSITION, mTableView);
+        mTableManager = getTableManager(pClass);
+        mTableManager.setItems(observableList);
+        mRoot.getChildren().add(TABLE_POSITION, mTableManager);
     }
 
     private void redrawArrow(final int pValue) {
@@ -151,8 +150,8 @@ public class UIManager {
     private void showMeter() {
         mWidgetRoot = new Group(mDrawer.outerRim(), mArrow, mDrawer.marks(), mDrawer.centerPoint());
         final EventHandler<Event> tableListener = getTableListener();
-        mTableView.setOnMouseClicked(tableListener);
-        mTableView.setOnKeyReleased(tableListener);
+        mTableManager.setOnMouseClicked(tableListener);
+        mTableManager.setOnKeyReleased(tableListener);
         mRoot.getChildren().add(mWidgetRoot);
     }
 }

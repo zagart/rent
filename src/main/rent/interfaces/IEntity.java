@@ -1,6 +1,6 @@
 package rent.interfaces;
 
-import javafx.scene.control.TableView;
+import rent.application.managers.TableManager;
 
 import java.io.Serializable;
 
@@ -11,9 +11,9 @@ import java.io.Serializable;
  * @author zagart
  */
 public interface IEntity<T extends ITableModel> extends Serializable {
-    T createTableModel();
+    TableManager<T> createTableManager();
 
-    TableView<T> createTableView();
+    T createTableModel();
 
     Long getId();
 }

@@ -1,5 +1,7 @@
 package rent.application.singletons;
 
+import rent.application.managers.ThreadManager;
+import rent.constants.Services;
 import rent.interfaces.IEntity;
 import rent.interfaces.IService;
 import rent.model.entities.*;
@@ -15,7 +17,7 @@ import java.util.Map;
  * @see IService
  */
 public class Context {
-    private Map<Class<?>, IService> mDaoRepository = new HashMap<Class<?>, IService>() {
+    private Map<Class<?>, IService> mServiceRepository = new HashMap<Class<?>, IService>() {
         {
             put(Bill.class, new BillService());
             put(Customer.class, new CustomerService());
@@ -23,6 +25,11 @@ public class Context {
             put(Passport.class, new PassportService());
             put(Payment.class, new PaymentService());
             put(Tariff.class, new TariffService());
+        }
+    };
+    private Map<String, Object> mSystemServicesRepository = new HashMap<String, Object>() {
+        {
+            put(Services.THREAD_MANAGER, new ThreadManager());
         }
     };
 
@@ -37,7 +44,11 @@ public class Context {
      */
     @SuppressWarnings("unchecked")
     public static <S extends IService, E extends IEntity> S getService(final Class<E> pEntityClass) {
-        return (S) SingletonHolder.CONTEXT.mDaoRepository.get(pEntityClass);
+        return (S) SingletonHolder.CONTEXT.mServiceRepository.get(pEntityClass);
+    }
+
+    public static Object getSystemService(final String pName) {
+        return SingletonHolder.CONTEXT.mSystemServicesRepository.get(pName);
     }
 
     private static class SingletonHolder {

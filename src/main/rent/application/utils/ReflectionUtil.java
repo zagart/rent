@@ -1,5 +1,8 @@
 package rent.application.utils;
 
+import rent.constants.ExceptionConstants;
+import rent.application.managers.TableManager;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -10,9 +13,17 @@ import java.lang.reflect.ParameterizedType;
  * @author zagart
  */
 public class ReflectionUtil {
-    public static Object getGenericObject(Object pTarget, int pParameterPosition) {
+    @SuppressWarnings("unchecked")
+    public static <T> Class<T> getGenericClass(final Object pTarget, final int pParameterPosition) {
+        if (pTarget instanceof TableManager) {
+            System.out.println("Success");
+        }
         final ParameterizedType parameterizedType = (ParameterizedType) pTarget.getClass().getGenericSuperclass();
-        final Class<?> clazz = (Class<?>) parameterizedType.getActualTypeArguments()[pParameterPosition];
+        return (Class<T>) parameterizedType.getActualTypeArguments()[pParameterPosition];
+    }
+
+    public static Object getGenericObject(final Object pTarget, final int pParameterPosition) {
+        final Class<?> clazz = getGenericClass(pTarget, pParameterPosition);
         return createGenericObject(clazz);
     }
 
@@ -22,7 +33,7 @@ public class ReflectionUtil {
         try {
             object = constructor.newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException pEx) {
-            throw new RuntimeException("Failed to get object from generic parameter");
+            throw new RuntimeException(ExceptionConstants.GENERIC_PARAMETER_EXTRACTION_EXCEPTION);
         }
         return object;
     }

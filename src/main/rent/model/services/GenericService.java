@@ -18,13 +18,13 @@ public class GenericService {
     @SuppressWarnings("unchecked")
     public <E extends IEntity<T>, T extends ITableModel> ObservableList getObservableList(final Class<E> pClass) {
         final List<E> entities = Context.getService(pClass).getAll();
-        final List<T> uiTariffs = new ArrayList<>();
+        final List<T> models = new ArrayList<>();
         for (final E entity : entities) {
             final T tableModel = entity.createTableModel();
             if (tableModel.getId() != null) {
-                uiTariffs.add(tableModel);
+                models.add(tableModel);
             }
         }
-        return FXCollections.observableList(uiTariffs);
+        return FXCollections.observableList(models);
     }
 }

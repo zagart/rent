@@ -1,10 +1,9 @@
 package rent.model.entities;
 
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import rent.application.utils.JavaFxUtil;
 import rent.interfaces.IEntity;
 import rent.ui.entities.UiPassport;
+import rent.application.managers.TableManager;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -27,12 +26,7 @@ public class Passport implements IEntity<UiPassport> {
     private String mPersonalNumber;
 
     @Override
-    public UiPassport createTableModel() {
-        return new UiPassport(this);
-    }
-
-    @Override
-    public TableView<UiPassport> createTableView() {
+    public TableManager<UiPassport> createTableManager() {
         final ArrayList<PropertyValueFactory> factories = new ArrayList<PropertyValueFactory>() {
             {
                 add(new PropertyValueFactory<UiPassport, String>(UiPassport.Fields.ID));
@@ -43,7 +37,7 @@ public class Passport implements IEntity<UiPassport> {
                 add(new PropertyValueFactory<UiPassport, String>(UiPassport.Fields.ISSUED_BY));
             }
         };
-        return JavaFxUtil.createTable(
+        return new TableManager<>(
                 factories,
                 Fields.ID,
                 Fields.CUSTOMER_ID,
@@ -51,6 +45,11 @@ public class Passport implements IEntity<UiPassport> {
                 Fields.DATE_OF_ISSUE,
                 Fields.EXPIRATION_DATE,
                 Fields.ISSUED_BY);
+    }
+
+    @Override
+    public UiPassport createTableModel() {
+        return new UiPassport(this);
     }
 
     @Id

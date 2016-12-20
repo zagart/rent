@@ -1,10 +1,9 @@
 package rent.model.entities;
 
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import rent.application.utils.JavaFxUtil;
 import rent.interfaces.IEntity;
 import rent.ui.entities.UiBill;
+import rent.application.managers.TableManager;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -29,12 +28,7 @@ public class Bill implements IEntity<UiBill> {
     private Tariff mTariff;
 
     @Override
-    public UiBill createTableModel() {
-        return new UiBill(this);
-    }
-
-    @Override
-    public TableView<UiBill> createTableView() {
+    public TableManager<UiBill> createTableManager() {
         final ArrayList<PropertyValueFactory> factories = new ArrayList<PropertyValueFactory>() {
             {
                 add(new PropertyValueFactory<UiBill, String>(UiBill.Fields.ID));
@@ -47,7 +41,7 @@ public class Bill implements IEntity<UiBill> {
                 add(new PropertyValueFactory<UiBill, String>(UiBill.Fields.DATE));
             }
         };
-        return JavaFxUtil.createTable(
+        return new TableManager<>(
                 factories,
                 Fields.ID,
                 Fields.CUSTOMER_ID,
@@ -57,6 +51,11 @@ public class Bill implements IEntity<UiBill> {
                 Fields.COLD_WATER_BILL,
                 Fields.HOT_WATER_BILL,
                 Fields.DATE);
+    }
+
+    @Override
+    public UiBill createTableModel() {
+        return new UiBill(this);
     }
 
     @Override

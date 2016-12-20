@@ -1,10 +1,9 @@
 package rent.model.entities;
 
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import rent.application.utils.JavaFxUtil;
 import rent.interfaces.IEntity;
 import rent.ui.entities.UiCustomer;
+import rent.application.managers.TableManager;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -51,12 +50,7 @@ public class Customer implements IEntity<UiCustomer> {
     }
 
     @Override
-    public UiCustomer createTableModel() {
-        return new UiCustomer(this);
-    }
-
-    @Override
-    public TableView<UiCustomer> createTableView() {
+    public TableManager<UiCustomer> createTableManager() {
         final ArrayList<PropertyValueFactory> factories = new ArrayList<PropertyValueFactory>() {
             {
                 add(new PropertyValueFactory<UiCustomer, String>(UiCustomer.Fields.ID));
@@ -67,7 +61,7 @@ public class Customer implements IEntity<UiCustomer> {
                 add(new PropertyValueFactory<UiCustomer, String>(UiCustomer.Fields.PHONE_NUMBER));
             }
         };
-        return JavaFxUtil.createTable(
+        return new TableManager<>(
                 factories,
                 Fields.ID,
                 Fields.FIRST_NAME,
@@ -75,6 +69,11 @@ public class Customer implements IEntity<UiCustomer> {
                 Fields.PATRONYMIC,
                 Fields.ADDRESS,
                 Fields.PHONE_NUMBER);
+    }
+
+    @Override
+    public UiCustomer createTableModel() {
+        return new UiCustomer(this);
     }
 
     @Override

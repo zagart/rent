@@ -11,7 +11,8 @@ import rent.model.entities.Passport;
  *
  * @author zagart
  */
-public class UiPassport implements ITableModel<Long> {
+public class UiPassport implements ITableModel<Long, Passport> {
+    final private Passport mPassport;
     private SimpleLongProperty mCustomerId = new SimpleLongProperty();
     private SimpleStringProperty mDateOfIssue = new SimpleStringProperty();
     private SimpleStringProperty mExpirationDate = new SimpleStringProperty();
@@ -28,7 +29,24 @@ public class UiPassport implements ITableModel<Long> {
             mId.set(pPassport.getId());
             mIssuedBy.set(pPassport.getIssuedBy());
             mPersonalNumber.set(pPassport.getPersonalNumber());
+            mPassport = pPassport;
+        } else {
+            mPassport = null;
         }
+    }
+
+    @Override
+    public Passport extractEntity() {
+        return mPassport;
+    }
+
+    @Override
+    public Long getId() {
+        return mId.get();
+    }
+
+    public void setId(long pId) {
+        this.mId.set(pId);
     }
 
     public long getCustomerId() {
@@ -47,21 +65,25 @@ public class UiPassport implements ITableModel<Long> {
         this.mDateOfIssue.set(pDateOfIssue);
     }
 
+    @Override
+    public boolean equals(final Object pO) {
+        if (this == pO) return true;
+        if (pO == null || getClass() != pO.getClass()) return false;
+        UiPassport that = (UiPassport) pO;
+        return mId.equals(that.mId);
+    }
+
+    @Override
+    public int hashCode() {
+        return mId.hashCode();
+    }
+
     public String getExpirationDate() {
         return mExpirationDate.get();
     }
 
     public void setExpirationDate(String pExpirationDate) {
         this.mExpirationDate.set(pExpirationDate);
-    }
-
-    @Override
-    public Long getId() {
-        return mId.get();
-    }
-
-    public void setId(long pId) {
-        this.mId.set(pId);
     }
 
     public String getIssuedBy() {
