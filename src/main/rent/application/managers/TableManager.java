@@ -1,5 +1,8 @@
 package rent.application.managers;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
@@ -28,7 +31,10 @@ import java.util.List;
 public class TableManager<M extends ITableModel> extends TableView<M> {
     private static final int ADDRESS_COLUMN_WIDTH = 200;
     private static final int COLUMN_WIDTH = 120;
+    private static final String CUSTOMER_ID_FIELD = "ID заказчика";
     private static final int FIRST_ITEM = 0;
+    private static final String ID_FIELD = "ID";
+    private static final String TARIFF_ID_TARIFF = "ID тарифа";
     private static final int TIMESTAMP_COLUMN_WIDTH = 150;
     private CustomStage mSecondaryStage;
     private UIManager mUIManager;
@@ -68,6 +74,21 @@ public class TableManager<M extends ITableModel> extends TableView<M> {
 
     void editRow() {
         openSecondaryStage(UiConstants.EDIT);
+    }
+
+    public <E extends IEntity> ChangeListener getSearchListener(final Class<E> pClass) {
+        return (ObservableValue pObservableValue, Object pOld, Object pNew) -> {
+            if (Customer.class == pClass) {
+                final String text = mUIManager.getSearch().getText();
+                final ObservableList<M> items = getItems();
+                for (int i = items.size() - 1; i >= 0; i--) {
+                    final Customer customer = (Customer) items.get(i).extractEntity();
+                    if (customer.getLastName().toLowerCase().contains(text.toLowerCase())) {
+                        getSelectionModel().select(items.get(i));
+                    }
+                }
+            }
+        };
     }
 
     private void openSecondaryStage(final String pConstant) {
@@ -125,10 +146,12 @@ public class TableManager<M extends ITableModel> extends TableView<M> {
         setEditable(true);
         for (int i = 0; i < pCaptions.length; i++) {
             String caption = pCaptions[i];
-            final TableColumn column = new TableColumn<>(caption);
-            column.setCellValueFactory(pFactories.get(i));
-            customizeColumnWidth(column, caption);
-            getColumns().add(column);
+            if (!caption.equals(ID_FIELD) && !caption.equals(CUSTOMER_ID_FIELD) && !caption.equals(TARIFF_ID_TARIFF)) {
+                final TableColumn column = new TableColumn<>(caption);
+                column.setCellValueFactory(pFactories.get(i));
+                customizeColumnWidth(column, caption);
+                getColumns().add(column);
+            }
         }
     }
 

@@ -1,10 +1,13 @@
 package rent.application.managers;
 
+import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -20,10 +23,12 @@ import rent.constants.UiConstants;
 import rent.interfaces.IEntity;
 import rent.model.entities.*;
 import rent.model.services.GenericService;
+import rent.ui.custom.CustomTextField;
 import rent.ui.entities.UiExpense;
 import rent.ui.main.WidgetDrawer;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Random;
 
 /**
  * Class for handling common UI operations.
@@ -32,15 +37,31 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class UIManager {
     private static final int BUTTON_WIDTH = 100;
+    private static final int COUNTER_MAX = 50;
     private static final int SELECTION_WINDOW_HEIGHT = 140;
     private static final int SELECTION_WINDOW_WIDTH = 100;
     private static final int TABLE_POSITION = 1;
     final private GenericService mManager = new GenericService();
+    final private Random mRandom = new Random();
+    private int counter = 0;
     private Node mArrow;
     private WidgetDrawer mDrawer = new WidgetDrawer();
+    private CustomTextField mNumericField;
     private FlowPane mRoot = new FlowPane();
+    private CustomTextField mSearch = new CustomTextField();
     private TableManager mTableManager;
     private Group mWidgetRoot;
+    private AnimationTimer mArrowTimer = new AnimationTimer() {
+        @Override
+        public void handle(final long pNow) {
+            if (counter++ > COUNTER_MAX && mTableManager.getItems().size() > 0) {
+                final int meterValue = mRandom.nextInt(DatabaseLoader.EXPENSE_BOUND);
+                redrawArrow(meterValue);
+                showMeterValue(meterValue);
+                counter = 0;
+            }
+        }
+    };
     private String mWindowTitle = "Title";
 
     public UIManager(final String pWindowTitle) {
@@ -62,11 +83,18 @@ public class UIManager {
         return crudMenu;
     }
 
-    private <L extends Event> EventHandler<L> getTableListener() {
-        return pEvent -> {
-            final UiExpense selectedExpense = (UiExpense) mTableManager.getSelectionModel().getSelectedItem();
-            redrawArrow(Math.toIntExact(selectedExpense.getGazExpense()));
-        };
+    public CustomTextField getSearch() {
+        return mSearch;
+    }
+
+    private <L extends Event, E extends IEntity> EventHandler<L> getTableListener(final Class<E> pClass) {
+        if (pClass == Expense.class) {
+            return pEvent -> {
+                final UiExpense selectedExpense = (UiExpense) mTableManager.getSelectionModel().getSelectedItem();
+                redrawArrow(Math.toIntExact(selectedExpense.getGazExpense()));
+            };
+        }
+        return null;
     }
 
     private TableManager getTableManager(final Class<?> pClass) {
@@ -89,10 +117,12 @@ public class UIManager {
                     switch (getSelectionModel().getSelectedIndex()) {
                         case 0:
                             reloadTableData(Expense.class);
-                            showMeter();
+                            showMeter(Expense.class);
                             break;
                         case 1:
                             reloadTableData(Customer.class);
+                            mSearch.textProperty().addListener(mTableManager.getSearchListener(Customer.class));
+                            showMeter(Customer.class);
                             break;
                         case 2:
                             reloadTableData(Bill.class);
@@ -110,7 +140,7 @@ public class UIManager {
                 });
             }
         };
-        return new VBox(menuItems, getCrudMenu());
+        return new VBox(mSearch, menuItems, getCrudMenu());
     }
 
     private void loadStage(final Stage pStage) {
@@ -122,13 +152,16 @@ public class UIManager {
     }
 
     private void redrawArrow(final int pValue) {
-        mWidgetRoot.getChildren().remove(mArrow);
-        mArrow = mDrawer.getArrowNode(pValue);
-        mWidgetRoot.getChildren().add(mArrow);
+        Platform.runLater(() -> {
+            mWidgetRoot.getChildren().remove(mArrow);
+            mArrow = mDrawer.getArrowNode(pValue);
+            mWidgetRoot.getChildren().add(mArrow);
+        });
     }
 
     @SuppressWarnings("unchecked")
-    public <E extends IEntity> void reloadTableData(final Class<E> pClass) {
+    <E extends IEntity> void reloadTableData(final Class<E> pClass) {
+        mArrowTimer.stop();
         final ObservableList<Node> children = mRoot.getChildren();
         children.remove(mTableManager);
         children.remove(mWidgetRoot);
@@ -148,8 +181,8 @@ public class UIManager {
         mRoot.setOrientation(Orientation.VERTICAL);
         mArrow = mDrawer.getArrowNode(WidgetDrawer.MIN_ANGLE);
         mRoot.getChildren().add(getTablesList());
-        reloadTableData(Expense.class);
-        showMeter();
+        reloadTableData(Customer.class);
+        showMeter(Customer.class);
         return mRoot;
     }
 
@@ -161,11 +194,28 @@ public class UIManager {
         loadStage(pStage);
     }
 
-    private void showMeter() {
-        mWidgetRoot = new Group(mDrawer.outerRim(), mArrow, mDrawer.marks(), mDrawer.centerPoint());
-        final EventHandler<Event> tableListener = getTableListener();
-        mTableManager.setOnMouseClicked(tableListener);
-        mTableManager.setOnKeyReleased(tableListener);
-        mRoot.getChildren().add(mWidgetRoot);
+    private <E extends IEntity> void showMeter(final Class<E> pClass) {
+        mNumericField = new CustomTextField();
+        mNumericField.setAlignment(Pos.CENTER);
+        mNumericField.setPrefWidth(100);
+        mNumericField.setLayoutX(50);
+        mNumericField.setLayoutY(140);
+        mNumericField.setEditable(false);
+        mWidgetRoot = new Group(mDrawer.outerRim(), mArrow, mDrawer.marks(), mDrawer.centerPoint(), mNumericField);
+        final EventHandler<Event> tableListener = getTableListener(pClass);
+        if (Expense.class == pClass) {
+            mTableManager.setOnMouseClicked(tableListener);
+            mTableManager.setOnKeyReleased(tableListener);
+        }
+        if (Customer.class == pClass) {
+            mWidgetRoot.setOnMouseClicked((pEvent) -> mRandom.nextInt(DatabaseLoader.EXPENSE_BOUND));
+            //TODO timer
+            mArrowTimer.start();
+            mRoot.getChildren().add(mWidgetRoot);
+        }
+    }
+
+    private void showMeterValue(final int pMeterValue) {
+        mNumericField.setText(String.valueOf(pMeterValue));
     }
 }
